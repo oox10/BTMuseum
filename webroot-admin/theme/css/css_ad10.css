@@ -1,0 +1,374 @@
+/**==[ 10管理系統通用MetaForm ]==**/
+
+/**===[ Meta FORM ]=== - 通用詮釋資料管理格式設定 **/
+
+
+.field_set{ /*欄位組*/
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+}
+
+.data_col{  /*單欄*/
+  width:100%;
+  margin-bottom:7px;
+  position:relative;
+}
+
+.field_set > .data_col{ flex:0 1 49%; }
+
+.data_col > label{
+  display:flex; 
+  min-height:37px;
+  padding:0 10px; 
+  position:relative;
+  align-items:center;
+  justify-content:flex-start;
+}  
+
+.data_value{  
+  display:flex; 
+  min-height:37px;
+  position:relative;
+  align-items:center;
+} 
+
+.data_value  input[type="text"] , 
+.data_value  input[type="time"] , 
+.data_value  input[type="date"] , 
+.data_value  input[type="datetime"] , 
+.data_value  input[type="file"] , 
+.data_value  input[type="tel"] , 
+.data_value  input[type="url"] , 
+.data_value  input[type="email"], 
+.data_value  input[type="file"],
+.data_value  input[type="number"],
+.data_value  select,
+.data_value  textarea
+{
+  color:#2792c3; 
+  border-width:0; 
+  width:99%; 
+  border:1px #eae8e1 solid; 
+  padding:8px 0 8px 8px;
+  border-radius:3px;
+  font-size:1em;
+  box-shadow:0 0 2px -1px rgba(0,0,0,0.1);
+}
+
+.data_value > textarea{
+  min-height:4em;	
+  resize: none;
+}
+
+.data_value input:read-only,
+.data_value textarea:read-only,
+.data_value input:disabled, 
+.data_value select:disabled,
+.data_value textarea:disabled{
+  background-color:#e4e4e4;	
+}	
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #c0c0c0;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #c0c0c0;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #c0c0c0;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #c0c0c0;
+}
+
+
+
+/*-- 類型調整 --*/
+.data_col._flat{ display:flex; }
+.data_col._flat > label{ flex:0 0 110px;}
+.data_col._flat > .data_value{ flex:1;}
+
+.data_value._bundle{ justify-content:space-between;}
+.data_value._bundle > *{flex:0 1 49%;}	
+ 
+/*-- 欄位附加類別 --*/
+.data_col._refer{}
+.data_col._refer > .data_value ._update{color:#68be8d;	}
+.data_col._refer > label::after{
+  display:inline;
+  font-size:12px;
+  color:#008b8b;
+  font-style: italic; 
+  content:"參考預填";				  
+}
+
+.data_col._flat._refer > label::after{
+  position:absolute;
+  bottom:-8px;
+  left:10px;  
+}
+
+label.data_field._must::before{
+  display:inline-block;
+  position:absolute; left:0; top:50%; margin-top:-10px; 
+  content:"•" ; 
+  color:red;   
+  font-size:20px;
+}
+
+._modify{background-color:#fdeff2;}
+
+._update._hold{border-color:#5f9ea0;color:#5f9ea0;}
+.act_holder_givup{
+  position:absolute;
+  right:0px;
+  top:-8px;
+  color:#5f9ea0;
+}
+	
+/*  還沒處理
+
+.field_set > label {display:inline-block; padding:5px 3px; font-weight:bold;}
+.field_set > label:after{content:" : "}
+.field_set > input[type=text] , .field_set > textarea , div.meta_pool[contenteditable=true] , .field_set > select {
+  border:1px #CDCDCD solid;
+  width:100%;
+  display:block; 
+  box-sizing:border-box; 
+  padding:8px 3px;
+  color:#474a4d;
+  font-size:15px;
+  background-color:#ffffff;
+  color:#2a83a2;
+}
+.field_set > textarea{height:4em; resize: none; } 		
+.field_set > select{ height:35px; } 			
+
+.field_set > input:read-only, .field_set > textarea:read-only , .field_set > select:disabled  {
+  border:1px #ffffff solid;	
+  background-color:#f3f4f5;
+}
+.field_set > input:disabled, .field_set > textarea:disabled{
+  border:1px #ffffff solid;	
+  background-color:#f3f4f5;
+}
+ 
+*/
+
+
+	
+	
+
+/**===[ FORM Element ]=== - 特殊元件設定  **/
+
+button{
+  display:inline-flex;	
+  align-items:center;
+  position:relative;
+}
+button > i{ padding:0 3px;}
+
+
+
+/* switch   :  must be label 因為需要與對應的  radio 互動，label才能達到此效果 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  transform: scale(0.5);
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+/* html5 slider style */ 
+
+input[type="range"]{
+  -webkit-appearance: none;
+  overflow:hidden;     /* 限定範圍 */
+  width:200px;
+  height:20px;
+  outline : none;      /* 避免點選會有藍線或虛線 */
+  background:none;
+}
+
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  position: relative;    /* 設為相對位置，為了前後區塊的絕對位置而設定 */
+  width:10px;
+  height:10px;
+  background:#f22;
+  border-radius:50%;
+  transition:.2s;        /* 點選放大時候的漸變時間 */
+}
+input[type="range"]::-webkit-slider-thumb:before,
+input[type="range"]::-webkit-slider-thumb:after
+{
+  position: absolute;
+  top: 3px;
+  width: 2000px;          /* 長度很長沒關係，因為剛剛有用 overflow:hidden 了 */
+  height: 4px;
+  content:"";
+  pointer-events: none;   /* 讓滑鼠可以點擊穿透偽元素，不然會點不到下面 */
+  transition:.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:before{
+  left: -1997px;
+  background: #f22;
+}
+input[type="range"]::-webkit-slider-thumb:after {
+  left: 10px;
+  background: #edc;
+}
+
+input[type="range"]:active::-webkit-slider-thumb:before,
+input[type="range"]:active::-webkit-slider-thumb:after
+{
+  top: 6px;
+}
+
+input[type="range"]:active::-webkit-slider-thumb{
+  width:16px;
+  height:16px;
+}
+
+input[type="range"]:active::-webkit-slider-thumb:after {
+  left: 16px;
+}
+
+
+input[type="range"]::-moz-range-track{
+  height:4px;
+  background:#edc;
+  border:none;
+}
+
+input[type="range"]::-moz-range-thumb{
+  width:10px;
+  height:10px;
+  background:#f22;
+  border:none;
+  border-radius:50%;
+}
+
+input[type="range"]::-moz-range-thumb:hover,input[type="range"]:active::-moz-range-thumb{
+  width:16px;
+  height:16px;
+}
+
+input[type="range"]::-moz-range-progress{
+  height:4px;
+  background:#f22;
+}
+
+input[type="range"]::-moz-focus-outer{
+  border:none;    /* 去除 focus 時候的外框虛線 */
+} 	
+
+/* button active loader 管理系統按鈕處理*/
+.processing{
+  display:inline-block;
+  position:relative;
+  background-color:rgba(0,0,0,1);
+}
+.processing::after{
+  content:"";
+  display:block;
+  position:absolute;
+  left:0; right:0; top:0; bottom:0;
+  background-color:rgba(0,0,0,0.4);  
+  z-index:11; 	  
+}
+.processing > *{ z-index:10; }
+.processing > i{
+  z-index:12; 	
+  position:absolute;
+  left:14px; top:50%;
+  margin-left:-8px;
+  margin-top:-8px;
+  display:none;
+}
+.processing > i.fa-exclamation-triangle{color:red;}
+.processing > i.fa-check{color:#00ff00;}
+.processing[status="L"] > .loader{ display: block;}
+.processing[status="F"] > i.fa-exclamation-triangle{display:block;}
+.processing[status="Y"] > i.fa-check{display:block;}
+
+.loader{
+  height: 15px;
+  width: 15px;
+  text-align: center;
+  display: block;
+  vertical-align: top;
+}
+
+@keyframes lds-dual-ring {
+  0%{
+	-webkit-transform: rotate(0);
+	transform: rotate(0);
+  }
+  100% {
+	-webkit-transform: rotate(360deg);
+	transform: rotate(360deg);
+  }
+}
+.lds-dual-ring {
+  position: relative;
+}
+.lds-dual-ring div {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #000;
+  border-color: #FF8800  transparent #FF8800  transparent;
+  animation: lds-dual-ring 1.3s linear infinite;
+}	

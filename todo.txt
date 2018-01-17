@@ -1,0 +1,13 @@
+TODO:
+新增件
+匯入
+欄位設定
+
+[builter]
+display ? / 佈展紀錄
+時間
+影像資料夾
+
+[viewer] 
+download browse picture
+resize rescale
