@@ -415,7 +415,6 @@
 	  }
 	});
 	
-	
 	//@-- 放棄暫存資料
 	$(document).on('click','.act_holder_givup',function(){
 	  
@@ -430,7 +429,6 @@
 	  $(this).remove();
 	
 	})
-	
 	
 	
 	//@-- 重新設定欄位  
@@ -630,11 +628,8 @@
 	  check_page_num();	
 	});
 	
-	 
 	
 	/***== [ VOLUME EDIT FUNCTION ] ==***/
-	
-	
 	
 	//-- ethnic select
 	$('select._ethnic_main').change(function(){
@@ -661,6 +656,18 @@
 	$('#META-V-store_location').change(function(){
 	  var store = $(this).val();
       if(store=='_newa') $(this).hide().next().show().focus();
+	});
+	
+	
+	//@-- 列印詮釋資料
+	$('#act_print_volume_meta').click(function(){
+	  window.print();
+	});
+	
+	//@-- 新增詮釋資料
+	$('#act_create_volume_meta').click(function(){
+	  system_loading();
+	  act_volume_create();
 	});
 	
 	
@@ -1762,7 +1769,32 @@
   }); /*** end of html load ***/
     
 
-	
+	//-- admin record active data print //列印函數
+	(function() {
+    var beforePrint = function() {
+		$('.page_print_container').empty();
+		$('div#record_master').clone().appendTo('.page_print_container');
+		
+        //console.log('Functionality to run before printing.');
+    };
+    var afterPrint = function() {
+		$('.page_print_container').empty();
+        //console.log('Functionality to run after printing');
+    };
+
+    if (window.matchMedia) {
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {
+			if ( mql.matches ) {
+                beforePrint();
+            } else {
+                afterPrint();
+            }
+        });
+    }
+    window.onbeforeprint = beforePrint;
+    window.onafterprint = afterPrint;
+    }());
      
 	//-- image load 輔助函數-1
 	$.createCache = function( requestFunction ) {
@@ -1890,7 +1922,10 @@
 	  }
 	  $('#task_info').find('li').hide().end().prepend(DOM);
 	}
-  
+    
+	
+	
+	
    
 	
 	

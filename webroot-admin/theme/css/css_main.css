@@ -889,18 +889,12 @@ body{ background:#eee; }
 	
 	
 	div.system_print_area{
-	  visibility: hidden;	
-	  position:fixed;
-	  top:0;
-	  left:0;
-	  right:0;
-	  bottom:0;
-	  z-index:500;  
+	  display:none;	
 	  background-color:#ffffff;	
 	}
 	  div.page_print_container{
-		position:absolute;
-	    width:1024px;
+		width:21cm;
+		min-height:100%;
 	  }
 	  
 	  

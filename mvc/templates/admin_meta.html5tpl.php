@@ -216,17 +216,18 @@
 					<option value='import'   title='回傳更新'     disabled >批次匯入-尚未開放</option>
 					<option value='print' title='勾選匯出報表' >列印報表</option>
 				  </optgroup>
+				  
+				  <!--
 				  <?php if($meta_edit_flag): ?>
 				  <optgroup label='資料設定' >
 				    <option value='logout/1' title='將勾選文物設定為註銷狀態' >批次註銷</option>
-				    <!--
 					<option value='open/0' title='檢索系統中找不到目前勾選的資料' >資料關閉</option>
 				    <option value='open/1' title='檢索系統中可以查詢目前勾選的資料' >資料開啟</option>
 					<option value='view/開放' title='數位檔案開放於網路上閱覽' >開放閱覽</option>
 				    <option value='view/不開放' title='不提供數位檔案閱覽'>不開放閱覽</option>
-				    -->
 				  </optgroup>
 				  <?php endif; ?>
+				  -->
 				  
 				</select>
 				<button type='button' class='active' id='act_execute_batch'>執行</button>

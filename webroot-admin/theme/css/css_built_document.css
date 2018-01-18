@@ -208,3 +208,18 @@ i.infield_name{
 
 i#fds{ left:41%;}
 i#fde{ right:10px;}
+
+
+@media print {
+  body > div{display:none;}
+  body > div.system_print_area{display:block;}
+  div#record_master{
+	position:relative;
+    display:block; 	  
+  }
+  div.form_group{display:block;page-break-inside:avoid;}
+  
+  div.system_print_area{visibility:visible;}
+  
+}	    
+

@@ -138,7 +138,9 @@
 				    <button class='act_switch_editor dofunc' to='next'	title='切換下一筆'> 下一筆 <i class="fa fa-chevron-right" aria-hidden="true"></i> <b>c</b></button>
 				  </span>
 				  <span  class='record_tasks'>  
-					<button class='dofunc ' id='act_save_volume_meta'	title='儲存卷資料'><i class="fa fa-floppy-o" aria-hidden="true"></i><b><i class="fa fa-times" aria-hidden="true"></i></b></button>	
+					<button class='dofunc ' id='act_create_volume_meta'	title='新增文物資料'><i class="fa fa-plus" aria-hidden="true"></i></button>	
+					<button class='dofunc ' id='act_print_volume_meta'	title='列印資料頁面'><i class="fa fa-print" aria-hidden="true"></i></button>	
+					<button class='dofunc ' id='act_save_volume_meta'	title='儲存文物資料'><i class="fa fa-floppy-o" aria-hidden="true"></i><b><i class="fa fa-times" aria-hidden="true"></i></b></button>	
 				  </span>
 				</header> 
 				<div class='record_body'>
@@ -754,10 +756,10 @@
 					  -->
 					  <optgroup label='編輯作業'>
 					    <option value='act_meta_editlogs'  >調閱編輯紀錄</option>
-					    <option value='act_volume_create'  >新增一卷</option>
+					    <option value='act_volume_create'  >新增文物資料</option>
 					  </optgroup>
 					  <optgroup label='移除作業'>
-					    <option value='act_volume_delete'  >刪除本卷</option>
+					    <option value='act_volume_delete'  >刪除文物資料</option>
 					  </optgroup>
 				    </select>
 				  </div>
@@ -1323,6 +1325,8 @@
 	    </div>
 	  </div>
 	</div>
+  
+    <div class='system_print_area'><div class='page_print_container'></div></div>
   
   </body>
 </html>
