@@ -10,12 +10,12 @@ div.system_message_area{top:45%;}
 #meta_field_store_no_value{ flex:0 0 150px; }
 
 
-#META-V-store_year{flex:0 0 70px;  }	
-#META-V-store_type{flex:0 0 30px;  }	
-#META-V-store_no1{flex:0 0 50px; }	
-#META-V-store_no2{flex:0 0 80px;  }	
-#META-V-store_no3{flex:0 0 30px;  }
-#META-V-store_id{flex:1; text-align:center;}
+div.data_value input#META-V-store_year{flex:0 0 70px;  }	
+div.data_value input#META-V-store_type{flex:0 0 30px;  }	
+div.data_value input#META-V-store_no1{flex:0 0 50px; }	
+div.data_value input#META-V-store_no2{flex:0 0 80px;  }	
+div.data_value input#META-V-store_no3{flex:0 0 30px;  }
+div.data_value input#META-V-store_id{flex:1; text-align:center;}
 
 select._ethnic_main{flex:0 0 40%;}
 ul.ethnic_assist > li{
