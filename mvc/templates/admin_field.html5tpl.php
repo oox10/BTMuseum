@@ -21,6 +21,7 @@
 	<!-- Self -->
 	<link rel="stylesheet" type="text/css" href="theme/css/css_default.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_main.css" />
+	<link rel="stylesheet" type="text/css" href="theme/css/css_ad10.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_field_admin.css" />
 	
 	<script type="text/javascript" src="js_library.js"></script>
@@ -32,9 +33,8 @@
 	<?php
 	$user_info 		= isset($this->vars['server']['data']['user']) 		? $this->vars['server']['data']['user'] 	: array('user'=>array('user_name'=>'Anonymous'),'group'=>array());
 	
-	$data_filter  	= isset($this->vars['server']['data']['syslogs']['filter']) 	? $this->vars['server']['data']['syslogs']['filter'] : array('date_start'=>date('Y-m-01'),'date_end'=>date('Y-m-t'));  
-	$data_list  	= isset($this->vars['server']['data']['syslogs']['list']) 	? $this->vars['server']['data']['syslogs']['list'] : array();  
-	$data_count 	= isset($this->vars['server']['data']['syslogs']['count']) 	? $this->vars['server']['data']['syslogs']['count'] : array();  
+	$source_digiarchive_fields = isset($this->vars['server']['data']['records']['source_digiarchive']) 	? $this->vars['server']['data']['records']['source_digiarchive'] : []; 
+    
 	
 	$page_info 		= isset($this->vars['server']['info']) ? $this->vars['server']['info'] : '';  
 	
@@ -54,10 +54,7 @@
         <div class='tool_banner' >
 		  <ol id='system_breadcrumbs' typeof="BreadcrumbList" >
 		  </ol>
-		  <ul class='mode_select'>
-		    <li class='mode_switch ' data-mode='index'>檢索系統紀錄</li>
-			<li class='mode_switch atthis' data-mode='sylogs'>系統活動紀錄</li>
-		  </ul>
+		   
 		  <span class='account_option tool_right'>
 		    <div class='account_info'>
 			  <span id='acc_mark'><i class='m_head'></i><i class='m_body'></i></span>
@@ -99,59 +96,64 @@
 		
 		<div class='topic_banner'>
 		  <div class='topic_header'> 
-		    <div class='topic_title'> 資料紀錄與統計 </div>
-			<div class='topic_descrip'> 系統資料數量、檢索系統使用紀錄 </div>
+		    <div class='topic_title'> 資料欄位設定 </div>
+			<div class='topic_descrip'> 文物與影像資料欄位設定 </div>
 		  </div>
 		</div>
 		
 		<div class='main_content' >
 		  <!-- 資料列表區 -->
 		  <div class='data_record_block' id='record_selecter' >
-		    <div class='record_header'>
-			  <span class='record_name'>系統操作紀錄</span>
-			  <span>
-			    <input type='text' class='record_filter' id='date_start' value='<?php echo $data_filter['date_start'];?>'> - 
-				<input type='text' class='record_filter' id='date_end'   value='<?php echo $data_filter['date_end'];?>'>
-				<span class='sysbtn' id='search_by_date' >查詢</span>
-			  </span>
-			  <span class='record_option'>
-			    <i class='sysbtn' id='act_record_export_system_logs' title='下載活動紀錄'><a class='btn_mark pic_excel_file_s'  ></a> 下載活動紀錄 </i>
-			  </span>
-			</div> 
-			<div class='record_body'>
-		      <h1 class='record_name'>系統操作紀錄：<?php echo $data_filter['date_start'];?> - <?php echo $data_filter['date_end'];?> 期間 , 共<?php echo $data_count;?>筆活動紀錄 </h1>
+		    <div class='record_body'>
+		      <h1 class='record_name'>文物資料欄位設定</h1>
 			  <table class='record_list system_logs'>
 		        <tr class='data_field'>
 				  <td title='no'	>no.</td>
-			      <td title='時間'	>時間</td>
-				  <td title='類型'	>IP</td>
-				  <td title='動作'	>動作</td>
-				  <td title='參數'	>參數</td>
-				  <td title='回應'	>回應</td>
-				  <td title='介面'	>介面</td>
-				  
+			      <td title=''	>欄位名稱</td>
+				  <td title=''	>欄位代號</td>
+				  <td title=''	>欄位型態</td>
+				  <td title=''	>內容格式</td>
+				  <td title=''	>是否可匯出</td>
+				  <td title=''	>是否可列印</td>
+				  <td title=''	>儲存</td>
 				</tr>
 				<tbody class='data_result' mode='list'   >   <!-- list / search--> 
-				<?php foreach($data_list as $i=> $record): ?>  
-				  <tr class='data_record actlog'>
-				    <td ><?php echo $record['slgno'] ;?>. </td>
-			        <td ><?php echo $record['time'] ;?></td>
-				    <td ><?php echo $record['acc_ip'] ;?></td>
-					<td ><?php echo $record['acc_act'] ;?></td>
-					
-					<td ><div class='longtext' ><?php echo $record['request'] ;?></div></td>
-					<td ><div class='longtext' ><?php echo $record['result'] ;?></div></td>
-					<td ><div class='longtext' ><?php echo $record['agent'] ;?></div></td>
+				<?php foreach($source_digiarchive_fields as $i=> $record): ?>  
+				  <tr class='data_record ' no='<?php echo $record['mfno']; ?>' >
+				    <td ><?php echo ($i+1); ?>. </td>
+					<td ><?php echo $record['descrip'] ;?></td>
+					<td ><?php echo $record['dbcolumn'] ;?>. </td>
+			        
+					<td >
+					<?php 
+					switch($record['module']){
+					  case 'E': echo "單選"; break;
+                      case 'S': echo "複選"; break;
+                      case 'V': echo "固定值"; break;
+                      case 'N': echo "數字"; break;
+                      default : echo "不限制"; break;		  
+					}
+					?>
+					</td>
+					<td ><textarea class='pattern_input _format' name="pattern" ><?php echo $record['pattern'] ;?></textarea></td>
+					<td >
+					  <label class="switch">
+						<input type="checkbox" class="boolean_switch _format" name="can_export"  data-save="1" data-default="0" <?php echo intval($record['can_export'])? 'checked' : '';?> />
+						<div class="slider round"></div>
+					  </label>
+					</td>
+					<td > 
+					  <label class="switch">
+						<input type="checkbox" class="boolean_switch _format" name="can_printout"  data-save="1" data-default="0" <?php echo intval($record['can_printout'])? 'checked' : '';?> />
+						<div class="slider round"></div>
+					  </label>
+					</td>
+					<td ><a class='option act_save_field_format' ><i class="fa fa-floppy-o" aria-hidden="true"></i> </td>
 			      </tr>
 				<?php endforeach; ?>
 			    </tbody>
 			  </table>
-			  <div class='record_control'>
-			  共 <?php echo $data_count;?> 筆
-			  <?php if(count($data_list) != $data_count):?>
-			   / 顯示前 1000 筆
-			  <?php endif; ?>	
-			  </div>
+			   
 		    </div>
 		  </div>
 		  

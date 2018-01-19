@@ -49,7 +49,7 @@
 				break;
 			
 			  // admin
-			  case 'Admin': case 'Main': case 'Staff': case 'Post': case 'Record': case 'Tracking':  case 'Mailer':  case 'Meta': case 'Project': 
+			  case 'Admin': case 'Main': case 'Staff': case 'Post': case 'Record': case 'Tracking':  case 'Mailer':  case 'Meta': case 'Field': 
 			  
 				// 檢查登入
 				if(!isset($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['LOGIN_TOKEN'])){
