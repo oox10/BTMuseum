@@ -992,6 +992,7 @@
 	  new_element.removeClass('_record_template').attr('no','_addnew');
 	  new_element.appendTo('.data_result').trigger('click'); 
 	  
+	  
 	});
 	
 	

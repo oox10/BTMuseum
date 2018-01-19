@@ -356,6 +356,7 @@ body{ background:#eee; }
 	  ul.main_manual span{
 		margin-left:2em;  
 	  }
+	  ul.main_manual .opgroup_name >span{margin-left:1.5em;}
 	  
 	    li.option_group{
 		  

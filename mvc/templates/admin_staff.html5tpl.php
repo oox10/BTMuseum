@@ -109,7 +109,28 @@
 			<div class='topic_descrip'> 群組內之帳號審核、設定與管理 </div>
 		  </div>
 		  <div class='module_setting' id='module_setting'>
-		   
+		  <!--
+		  <?php if( $admin_open || isset($ui_config['admin_staff.html5tpl.php']['module_setting']) && intval($ui_config['admin_staff.html5tpl.php']['module_setting'])): ?> 
+			<h2>模組參數設定</h2>
+			<ul class='mdconfig'>
+			<?php if(isset($module_config['setting'])):?>  
+			<?php   foreach($module_config['setting'] as $i => $mset): ?>
+			  <li>
+			    <label><?php echo ($i+1).'. '.$mset['label']; ?></label>
+				<?php if($mset['type']=='switch'): ?>
+			    <label class="switch" >
+				  <input type="checkbox"  class='module_config' name='<?php echo $mset['field']; ?>' data-module='<?php echo $mset['module']; ?>'  data-save='<?php echo $mset['setting'];?>'  data-default='<?php echo $mset['default']; ?>'  <?php echo intval($mset['setting'])?'checked':''; ?>  />
+				  <div class="slider round"></div>
+				</label>
+				<?php elseif($mset['type']=='text'): ?>
+			    <input type='text' name='<?php echo $mset['field']; ?>' data-module='<?php echo $mset['module']; ?>' value='<?php echo $mset['setting']; ?>' data-save='<?php echo $mset['setting'];?>' data-default='<?php echo $mset['default']; ?>' />
+			    <?php endif; ?>
+			  </li>
+			<?php   endforeach; ?>
+			<?php endif; ?>
+			</ul>
+		  <?php endif ?>	
+		  -->
 		  </div> 
 		  <div class='lunch_option'> 
 		    <?php if($admin_open || isset($ui_config['admin_staff.html5tpl.php']['act_set_gmember']) && intval($ui_config['admin_staff.html5tpl.php']['act_set_gmember'])): ?> 
@@ -252,7 +273,7 @@
 		    <div class='record_header'>
 			  <span class='record_name'>帳號資料</span>
 			  <span class='record_option'>
-			    <button id='act_staff_save'><a class='btn_mark pic_save'  ></a></button>
+			    <button id='act_staff_save' > <a class='btn_mark pic_save'  ></a></button>
 			   ｜
 			    <a class='sysbtn data_trival' id='act_record_prev' title='上一筆' ><i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
 			    <a class='sysbtn data_trival' id='act_record_next' title='下一筆'><i class="fa fa-angle-double-right" aria-hidden="true"></i></a>

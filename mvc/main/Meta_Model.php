@@ -158,13 +158,13 @@
 					"field"=>"list_ethnic",
 					"size" => "50"	
 				  ]
-				],
+				],/*
 				"pq_savedyear"=>[
 				  "terms"=>[
 					"field"=>"savedyear",
 					"size" => "50"	
 				  ]
-				],
+				],*/
 				"pq_list_store_location"=>[
 				  "terms"=>[
 					"field"=>"list_store_location",
@@ -2888,7 +2888,6 @@
 				    $search_conf['data_type']   = 'element';
 				    
 				    
-					$search_conf['ethnic']   	= $source_array['element']['ethnic'];
 					$search_conf['location']   	= $source_array['element']['location'];
 					$search_conf['period']   	= $source_array['element']['period'];
 					$search_conf['creator']   	= $source_array['element']['creator'];
@@ -2898,7 +2897,6 @@
 					
 					
 					// 後分類篩選
-					$search_conf['list_ethnic'] 		= self::paser_postquery([$source_array['element']['ethnic']]);
 					$search_conf['list_dotype'] 		= self::paser_postquery([$source_array['element']['dotype']]);
 					
 					$search_conf['_flag_secret']  = $source_array['element']['_flag_secret'];
