@@ -48,7 +48,7 @@
 				  </div> 
 				</div>
 				<div class='register_borad'>
-				  <a id='act_register'>註冊</a>
+				<!--  <a id='act_register'>註冊</a> -->
 				</div>			
 			  </div>
 		  
