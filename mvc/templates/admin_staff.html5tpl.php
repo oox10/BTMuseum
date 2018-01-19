@@ -147,9 +147,11 @@
 			  <span class='record_option'>
 			    資料篩選：	
 				<input type='radio' name='data_type' value='all' <?php echo $data_type=='all'?'checked':''; ?> >全部帳號
+				<!--
 				<input type='radio' name='data_type' value='mbr' <?php echo $data_type=='mbr'?'checked':''; ?> >註冊會員
 				<input type='radio' name='data_type' value='tpa' <?php echo $data_type=='tpa'?'checked':''; ?> >單位帳號
 				<input type='radio' name='data_type' value='self' <?php echo $data_type=='self'?'checked':''; ?> >我的帳號
+				-->
 				/ 搜尋:
 				<span class='record_search_field'> 
 				  <input  type='text'   id='data_search_condition' name='data_search' value='<?php echo isset($html_conf['condition'])&&$html_conf['condition'] ?$html_conf['condition']:'';?>' placeholder='輸入搜尋條件'  />
