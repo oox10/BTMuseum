@@ -45,7 +45,7 @@
 			  <li  title='資料管理'	 class='option func_activate'	id='Meta'	><i class="fa fa-picture-o" aria-hidden="true"></i> <span style='font-size:0.9em;'>館藏管理</span> </li>
 			  <?php endif; ?>
 			  <?php if($admin_filter || (isset($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['PERMISSION'][strtolower('Field')]) && intval($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['PERMISSION'][strtolower('Field')])!=0) ): ?>
-			  <li  title='欄位管理'	 class='option '	id='Field'	><i class="fa fa-th-list" aria-hidden="true"></i> <span style='font-size:0.9em;'>欄位管理</span> </li>
+			  <li  title='欄位管理'	 class='option func_activate'	id='Field'	><i class="fa fa-th-list" aria-hidden="true"></i> <span style='font-size:0.9em;'>欄位管理</span> </li>
 			  <?php endif; ?>
 			</ul>
 		  </li>
