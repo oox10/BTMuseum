@@ -82,7 +82,7 @@ class Account_Controller extends Admin_Controller{
 		self::redirectTo('index.php?'.$_SESSION[_SYSTEM_NAME_SHORT]['RrDIRECT']);   
 		unset($_SESSION[_SYSTEM_NAME_SHORT]['RrDIRECT']);
 	  }else{
-		self::redirectTo('index.php?act=Staff'); 
+		self::redirectTo('index.php?act=Meta'); 
 	  } 
 	}
 	
