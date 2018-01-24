@@ -46,6 +46,8 @@
 		throw new Exception('無來源資料');     
 	  }
 	  
+	  sort($dosource);
+	  
 	  foreach($dosource as $dofile){
 		
 		$do_name_set = explode('-',preg_replace('/(\s+)?(\(\d+\))?\.(JPG|jpg)/','',$dofile));  
