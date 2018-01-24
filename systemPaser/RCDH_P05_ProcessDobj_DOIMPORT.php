@@ -45,28 +45,42 @@
 	  if(!count($dosource)){
 		throw new Exception('無來源資料');     
 	  }
-	  
-	  sort($dosource);
-	  
+	   
+	 
 	  foreach($dosource as $dofile){
+		
+		if(preg_match('/(\s+)?(\((\d+)\))?\.(JPG|jpg)/',$dofile,$match)){
+		  $donumber = intval($match[3]);	
+		}else{
+		  $donumber = 0;	
+		}
 		
 		$do_name_set = explode('-',preg_replace('/(\s+)?(\(\d+\))?\.(JPG|jpg)/','',$dofile));  
 		$do_store_id = str_pad($do_name_set[0],3,'0',STR_PAD_LEFT).'-'.$do_name_set[1].'-'.str_pad($do_name_set[2],2,'0',STR_PAD_LEFT).'-'.str_pad($do_name_set[3],3,'0',STR_PAD_LEFT); 
 		
 		if(!isset($do_source_array[$do_store_id])) $do_source_array[$do_store_id] = [];
         
-		$do_source_array[$do_store_id][] = [
-		  'bookid' => $do_store_id,
-		  'filename' => $dofile,
-		  'filepath' => _SOURCE_LOCATION.$dofile,
-		];
-	  
+		if($donumber){
+		  $do_source_array[$do_store_id][$donumber] = [
+		    'bookid' => $do_store_id,
+		    'filename' => $dofile,
+		    'filepath' => _SOURCE_LOCATION.$dofile,
+		  ];	
+		}else{
+		  $do_source_array[$do_store_id][] = [
+		    'bookid' => $do_store_id,
+		    'filename' => $dofile,
+		    'filepath' => _SOURCE_LOCATION.$dofile,
+		  ];	
+		}
 	  }
 	  
 	  
 	  $page_count = 0;
 	  
 	  foreach($do_source_array as $bookid => $bookimages){
+		
+		ksort($bookimages);
 		
 		$db_select = $db->DBLink->prepare("SELECT * FROM ".$source_table." WHERE store_id LIKE :bookid;");
 		$db_select->execute(array('bookid'=>$bookid.'%'));
