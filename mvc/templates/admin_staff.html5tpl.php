@@ -173,7 +173,7 @@
 				  <?php endif;?>
 			    </span>
 				<span class='record_option'>
-				  <a class='sysbtn' id='act_bath_account_pass' title='勾選名單批次通過'> <i class="fa fa-check-circle-o" aria-hidden="true"></i> 批次通過 </a>
+				  <!-- <a class='sysbtn' id='act_bath_account_pass' title='勾選名單批次通過'> <i class="fa fa-check-circle-o" aria-hidden="true"></i> 批次通過 </a> -->
 			    </span>
 			  </div>
 			  <table class='record_list'>
