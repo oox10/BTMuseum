@@ -19,6 +19,7 @@
 	<!-- Self -->
 	<link rel="stylesheet" type="text/css" href="theme/css/css_default.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_main.css" />
+	<link rel="stylesheet" type="text/css" href="theme/css/css_ad10.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_track_admin.css" />
 	
 	<script type="text/javascript" src="js_library.js"></script>
@@ -172,7 +173,7 @@
 			  <span class='record_name'>回報資料</span>
 			  <span class='record_option'>
 			    <?php if( $admin_open || isset($ui_config['admin_track.html5tpl.php']['track_admin']) && intval($ui_config['admin_track.html5tpl.php']['track_admin'])): ?> 
-				<i class='sysbtn' id='act_report_save'><a class='btn_mark pic_save'  ></a></i> 
+				<button id='act_report_save'><a class='btn_mark pic_save'  ></a></button> 
 				<?php endif; ?>
 				<a class='option view_switch' id='editor_switch' >  +  </a>
 				<a class='option' id='editor_reform'  >  &times;  </a>

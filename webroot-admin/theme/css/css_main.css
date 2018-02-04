@@ -973,7 +973,7 @@ body{ background:#eee; }
 		
 	.pic_group_leave{background:url('../image/staff_leave_group.png') 0 0; }	
 		
-	.pic_report_status_INITIAL{ background:url('../image/status_mark_error.png') 0 0;}
+	.pic_report_status_INITIAL{ background:url('../image/mark_A_I.png') 0 0;}
 	.pic_report_status_HANDEL{ background:url('../image/mark_report_handle.png') 0 0;}	
 	.pic_report_status_FINISH{ background:url('../image/mark_O_V.png') 0 0;}	
     
