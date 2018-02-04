@@ -105,8 +105,8 @@
 		
 		<div class='topic_banner'>
 		  <div class='topic_header'> 
-		    <div class='topic_title'> 群組帳號管理 </div>
-			<div class='topic_descrip'> 群組內之帳號審核、設定與管理 </div>
+		    <div class='topic_title'> 帳號管理 </div>
+			<div class='topic_descrip'> 帳號審核、設定與管理 </div>
 		  </div>
 		  <div class='module_setting' id='module_setting'>
 		  <!--
