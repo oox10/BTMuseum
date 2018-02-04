@@ -42,6 +42,7 @@
 	<!-- Self -->
 	<link rel="stylesheet" type="text/css" href="theme/css/css_default.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_main.css" />
+	<link rel="stylesheet" type="text/css" href="theme/css/css_ad10.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_post_admin.css" />
 	
 	<script type="text/javascript" src="js_library.js"></script>
@@ -207,7 +208,7 @@
 		    <div class='record_header'>
 			  <span class='record_name'>公告資料</span>
 			  <span class='record_option'>
-                <i class='sysbtn' id='act_post_save'><a class='btn_mark pic_save'  ></a></i>
+                <button id='act_post_save'><a class='btn_mark pic_save'  ></a></button>
 				<a class='option view_switch' id='editor_switch' >  +  </a>
 				<a class='option' id='editor_reform'  >  &times;  </a>
 			  </span>
