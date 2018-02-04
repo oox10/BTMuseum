@@ -276,7 +276,7 @@
 		    modify_data[field_name]  =  field_value;
 	      }
 		  
-		  if( $(this).parent().prev().hasClass('_necessary') && field_value==''  ){  
+		  if( $(this).parent().prev().hasClass('_must') && field_value==''  ){  
 			$(this).focus();
 			system_message_alert('',"請填寫必要欄位 ( * 標示)");
 		    checked = false;

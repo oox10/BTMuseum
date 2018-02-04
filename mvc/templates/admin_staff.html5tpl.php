@@ -277,10 +277,9 @@
 			  <span class='record_option'>
 			    <button id='act_staff_save' > <a class='btn_mark pic_save'  ></a></button>
 			   ｜
-			    <a class='sysbtn data_trival' id='act_record_prev' title='上一筆' ><i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
-			    <a class='sysbtn data_trival' id='act_record_next' title='下一筆'><i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
-                
-				<a class='option view_switch' id='editor_switch' >  +  </a>
+			    <button class='data_trival' id='act_record_prev' title='上一筆' ><i class="fa fa-angle-double-left" aria-hidden="true"></i></button>
+				<button class='data_trival' id='act_record_next' title='下一筆'><i class="fa fa-angle-double-right" aria-hidden="true"></i></button>
+                <a class='option view_switch' id='editor_switch' >  +  </a>
 				<a class='option' id='editor_reform'  >  &times;  </a>
 			  </span>
 			</div> 

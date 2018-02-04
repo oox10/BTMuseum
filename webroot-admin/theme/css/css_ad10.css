@@ -319,6 +319,8 @@ input[type="range"]::-moz-focus-outer{
   display:inline-block;
   position:relative;
   background-color:rgba(0,0,0,1);
+  line-height:normal;
+  padding:1px;
 }
 .processing::after{
   content:"";
