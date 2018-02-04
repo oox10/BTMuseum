@@ -111,11 +111,12 @@
 }
 
 label.data_field._must::before{
-  display:inline-block;
+  display:inline;
   position:absolute; left:0; top:50%; margin-top:-10px; 
   content:"•" ; 
   color:red;   
   font-size:20px;
+  height:20px; line-height:20px;
 }
 
 ._modify{background-color:#fdeff2;}

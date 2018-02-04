@@ -286,8 +286,8 @@
 			</div> 
 		    <div class='record_body tr_like' id='record_form_block'>  
 			  <div class='form_block float_cell' id='meta_input'>
-			    <div class='data_col '> <label class='data_field _necessary'> 登入帳號 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_id' default='readonly' /> </div> </div>
-				<div class='data_col '> <label class='data_field _necessary'> 連絡信箱 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_mail' /> </div> </div>
+			    <div class='data_col '> <label class='data_field _must'> 登入帳號 </label><div class='data_value'> <input type='text' class='_variable _update _must' id='user_id' default='readonly' /> </div> </div>
+				<div class='data_col '> <label class='data_field _must'> 連絡信箱 </label><div class='data_value'> <input type='text' class='_variable _update _must' id='user_mail' /> </div> </div>
 			    <div class='data_col '> <label class='data_field '> 姓名 </label><div class='data_value mutile_fields'><input type='text' class='_variable _update' id='user_name' />  /  <input type='text' class='_variable _update' id='user_idno' placeholder='代號(非必填)' /></div> </div>
 				<div class='data_col '> <label class='data_field '> 連絡電話 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_tel' /> </div> </div>
 				<div class='data_col '> <label class='data_field '> 聯繫地址 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_address' /> </div> </div>
@@ -295,11 +295,7 @@
 				  <div class='data_col '> <label class='data_field '> 單位 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_organ' /> </div> </div>
 				  <div class='data_col '> <label class='data_field '> 職稱/職業 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_staff' /> </div> </div>
 				</div>  
-               	<div class='fieldset '> 
-				  <div class='data_col '> <label class='data_field '> 年齡 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_age' /> </div> </div>
-				  <div class='data_col '> <label class='data_field '> 教育程度 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_education' /> </div> </div>
-				</div>  
-				<div class='data_col '> <label class='data_field '> 主修 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_major' /> </div> </div>
+               	<div class='data_col '> <label class='data_field '> 備註 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_info' /> </div> </div>
 			  </div>
 			  <div class='form_block float_cell' id='status_input'>
 			    
