@@ -134,7 +134,7 @@
 		  </div> 
 		  <div class='lunch_option'> 
 		    <?php if($admin_open || isset($ui_config['admin_staff.html5tpl.php']['act_set_gmember']) && intval($ui_config['admin_staff.html5tpl.php']['act_set_gmember'])): ?> 
-			<button type="button" class='active' id='act_set_gmember'><i class="fa fa-users" aria-hidden="true"></i> 設定群組</button>
+			<button type="button" class='active' id='act_set_gmember'><i class="fa fa-users" aria-hidden="true"></i> <span>設定群組</span></button>
 			<?php endif ?>
 		  </div>
 		</div>
