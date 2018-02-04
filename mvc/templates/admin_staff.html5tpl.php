@@ -288,7 +288,7 @@
 			  <div class='form_block float_cell' id='meta_input'>
 			    <div class='data_col '> <label class='data_field _must'> 登入帳號 </label><div class='data_value'> <input type='text' class='_variable _update _must' id='user_id' default='readonly' /> </div> </div>
 				<div class='data_col '> <label class='data_field _must'> 連絡信箱 </label><div class='data_value'> <input type='text' class='_variable _update _must' id='user_mail' /> </div> </div>
-			    <div class='data_col '> <label class='data_field '> 姓名 </label><div class='data_value mutile_fields'><input type='text' class='_variable _update' id='user_name' />  /  <input type='text' class='_variable _update' id='user_idno' placeholder='代號(非必填)' /></div> </div>
+			    <div class='data_col '> <label class='data_field _must'> 姓名 </label><div class='data_value mutile_fields'><input type='text' class='_variable _update _must' id='user_name' />  /  <input type='text' class='_variable _update' id='user_idno' placeholder='代號(非必填)' /></div> </div>
 				<div class='data_col '> <label class='data_field '> 連絡電話 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_tel' /> </div> </div>
 				<div class='data_col '> <label class='data_field '> 聯繫地址 </label><div class='data_value'> <input type='text' class='_variable _update' id='user_address' /> </div> </div>
 				<div class='fieldset '> 
@@ -300,7 +300,7 @@
 			  <div class='form_block float_cell' id='status_input'>
 			    
 				<div class='data_col '> 
-				  <label class='data_field _necessary'> 使用期限 </label>
+				  <label class='data_field _must'> 使用期限 </label>
 				  <div class='data_value mutile_fields'> 
 				    <input type='text' class='datetime _variable _update' id='date_open' /> - <input type='text' class='datetime _variable _update' id='date_access' />
 				  </div>
@@ -313,7 +313,7 @@
 				  <label class='data_field'> 帳號群組 </label>
 				  <div class='data_value'>  <span class='_variable' name='groups' id="main_group" >123</span>  </div> 
 				</div>
-				
+				 
 				
 				<?php if($admin_open || isset($ui_config['admin_staff.html5tpl.php']['roleset']) && intval($ui_config['admin_staff.html5tpl.php']['roleset'])): ?> 
 				<div class='data_col' id='roleset'> 
@@ -333,10 +333,6 @@
 				</div>
 				<?php endif;?> 
 				
-				<div class='data_col '> 
-				  <label class='data_field'> 加入群組 </label>
-				  <div class='data_value'> <span class='_variable' name='groups' id="rela_group" ></span> -</div> 
-				</div>
 				
 				<?php if($admin_open || isset($ui_config['admin_staff.html5tpl.php']['statusset']) && intval($ui_config['admin_staff.html5tpl.php']['statusset'])): ?> 
 				<div class='data_col ' id='statusset'> 

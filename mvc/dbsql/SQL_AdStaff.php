@@ -79,7 +79,7 @@
 	
 	//-- Admin Staff : Get Staff Admin Data
 	public static function ADMIN_STAFF_GET_STAFF_ADMIN_DATA(){
-	  $SQL_String = "SELECT uno,user_id,date_open,date_access,ip_range,user_status,user_name,user_idno,user_mail,user_staff,user_organ,user_tel,user_address,user_education,user_age,user_major FROM user_login LEFT JOIN user_info ON uid=uno WHERE uno=:uno AND user_status >= 0;";
+	  $SQL_String = "SELECT uno,user_id,date_open,date_access,ip_range,user_status,user_name,user_idno,user_mail,user_staff,user_organ,user_tel,user_address,user_education,user_age,user_info FROM user_login LEFT JOIN user_info ON uid=uno WHERE uno=:uno AND user_status >= 0;";
 	  return $SQL_String;
 	}
 	

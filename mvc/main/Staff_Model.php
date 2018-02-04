@@ -51,6 +51,7 @@
 	  } catch (Exception $e) {
         $result['message'][] = $e->getMessage();
       }
+	   
 	  return $result;
 	
 	}
@@ -328,7 +329,7 @@
 	  
 	  $staff_modify = json_decode(base64_decode(rawurldecode($StaffModify)),true);
 	  $staff_roles  = json_decode(base64_decode(rawurldecode($UserRoles)),true);
-	  
+	 
 	  try{  
 		
 		// 檢查使用者序號
