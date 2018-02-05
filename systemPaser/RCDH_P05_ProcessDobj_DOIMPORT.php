@@ -20,7 +20,7 @@
    
 	$file_allow = array('jpg','png','tiff','wmv','mp4','mp3');
 	
-	define('_SOURCE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/20180204/');
+	define('_SOURCE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/20180120/');
 	define('_STORE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH);
 	define('_SOURCE_UNPASER',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/unpaser/');
 	 
