@@ -131,7 +131,9 @@
 				$db_insert->bindValue(':status_descrip', trim($objSheet->getCellByColumnAndRow( 11 ,$row)->getValue()));
 				
 				$store_date = trim($objSheet->getCellByColumnAndRow( 2,$row)->getValue());
-				$store_date = strtotime($store_date) ? date('Y-m-d',strtotime($store_date)) : date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($store_date));
+				if($store_date){
+				  $store_date = strtotime($store_date) ? date('Y-m-d',strtotime($store_date)) : date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($store_date));	
+				}
 				
 				$db_insert->bindValue(':store_date'	,$store_date);
 				$db_insert->bindValue(':store_location' , trim($objSheet->getCellByColumnAndRow(13 ,$row)->getValue()) ? trim($objSheet->getCellByColumnAndRow(13 ,$row)->getValue()) : '北投庫房' );
