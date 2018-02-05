@@ -218,8 +218,6 @@
 	  }
 	  
 	  $(window).resize(function(event) {
-		console.log(event)
-		
 		resize_doplayform()
 	  });
 	  

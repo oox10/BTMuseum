@@ -148,14 +148,14 @@
 					
 					
 					// 確認日期
-					$search_conf['date_string'] = '民國'.$source['collection']['store_no1'].'年入館';
+					$search_conf['date_string'] = '民國'.$source['collection']['store_year'].'年入館';
 					
 					$meta_date[] = $source['collection']['store_date'];
 					$parsedate = paser_date($meta_date);
 					$search_conf['date_start'] = $parsedate['ds'];
 					$search_conf['date_end']   = $parsedate['de'];
 					
-					$search_conf['storeyear']  = ['民國'.$source['collection']['store_no1'].'年'];
+					$search_conf['storeyear']  = ['民國'.$source['collection']['store_year'].'年'];
 					$search_conf['savedyear']  = $parsedate['years'];
 					
 					$search_conf['title']   		= $source['collection']['title'];
@@ -179,8 +179,6 @@
 					
 					$search_conf['count_dofiles']   	= $source['collection']['count_dofiles'];
 					$search_conf['count_element']   	= $source['collection']['count_element'];
-					
-					
 					
 					// 後分類篩選
 					$search_conf['list_store_type']		= paser_postquery([$source['collection']['store_type']]);

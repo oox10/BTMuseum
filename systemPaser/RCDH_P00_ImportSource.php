@@ -14,7 +14,10 @@
     $db = new DBModule;
     $db->db_connect('PDO'); 
 	
-	$file_path = dirname(__FILE__).'/rawdata/testdata/';
+	$file_path  = dirname(__FILE__).'/rawdata/orldata/';
+	
+	$fail_sheet = array();
+	$counter    = 0;
 	
 	try{ 
       
@@ -31,10 +34,10 @@
 		  }
 		  
 		  $db_insert = $db->DBLink->prepare("INSERT INTO source_digiarchive VALUES(".
-		    "NULL,:class,:zong,:fonds,:store_no,:store_year,:store_type,:store_no1,:store_no2,:store_no3,".
+		    "NULL,:class,:zong,:fonds,:store_no,:store_id,:store_year,:store_type,:store_no1,:store_no2,:store_no3,:store_orl,".
 			":title,:categories,:size_info,:ethnic,:period,:saved_year,:acquire_type,:acquire_info,".
-			":status_code,:status_descrip,:store_date,:store_location,:store_number,:store_boxid,:remark,".
-			"'館內','0','0','1','北投測試','0000-00-00 00:00:00',:user,NULL,'',1);");
+			":status_code,:status_descrip,:store_date,:store_location,:store_number,:store_boxid,:store_boxidorl,0,'',:remark,'',0,0,".
+			"'館內','0','0','1','北投文物館','0000-00-00 00:00:00',:user,NULL,'',1);");
 			
 		  $excelReader = PHPExcel_IOFactory::createReaderForFile($file_path.$source);
 		  $excelReader->setReadDataOnly(true);
@@ -43,67 +46,108 @@
 		  $excel_sheet_num = $objPHPExcel->getSheetCount();
 		  $excel_sheet_names = $objPHPExcel->getSheetNames();
 		  
-		  $excel_sheet_num = 1;
-		  $counter = 0;
+		  
 		  
 		  for($sheet=0;$sheet<$excel_sheet_num;$sheet++){
 			  
 			  echo $sheet.'-';
 			  $objSheet=$objPHPExcel->getSheet($sheet);
 			  $row=2;
-			  echo trim($objSheet->getCellByColumnAndRow(1,$row)->getValue());
+			  $finish = 0;
 			  
-			  while( trim($objSheet->getCellByColumnAndRow(2,$row)->getValue()) ){
+			  while( $finish < 10 ){
 				
-				$orl_id_set  = explode('-',trim($objSheet->getCellByColumnAndRow( 2 ,$row)->getValue()));
+				echo trim($objSheet->getCellByColumnAndRow(3,$row)->getValue());
+				
+				$orl_id_str  = trim($objSheet->getCellByColumnAndRow( 3 ,$row)->getValue());
+				$orl_id_set  = explode('-',$orl_id_str);
 				$new_id_set  = [];
 				
 				$new_id_set[0] = isset($orl_id_set[0]) && intval($orl_id_set[0]) ? str_pad(intval($orl_id_set[0]),3,'0',STR_PAD_LEFT) : '000';
  				$new_id_set[1] = isset($orl_id_set[1]) ? strtoupper($orl_id_set[1]) : 'Z';
  				$new_id_set[2] = isset($orl_id_set[2]) && intval($orl_id_set[2]) ? str_pad(intval($orl_id_set[2]),2,'0',STR_PAD_LEFT) : '00';
  				$new_id_set[3] = isset($orl_id_set[3]) && intval($orl_id_set[3]) ? str_pad(intval($orl_id_set[3]),3,'0',STR_PAD_LEFT) : '000';
- 				$new_id_set[4] = 'a';
+ 				
+				$new_id_set[4] = isset($orl_id_set[4]) && preg_match('/^(\w+)$/',$orl_id_set[4],$match) ? strtolower($match[1]) : '';
 				
-				$store_no = join('-',$new_id_set);
+				if( $new_id_set[4]=='' && isset($orl_id_set[3])  && preg_match('/\((\w{1,2})\)/i',$orl_id_set[3],$match2)){
+				  $new_id_set[4] = strtolower($match2[1]);	
+				}
+				
+				$new_id_set = array_filter($new_id_set);
+				
+				if($orl_id_str=='' || (count(array_filter($orl_id_set))!=4&&count(array_filter($orl_id_set))!=5) || !preg_match('/^\d\d\d\-\w\-\d\d\-\d\d\d(\-\w+)?$/',join('-',$new_id_set))){
+				  
+				  echo ' id fail.'."\n";
+				  $fail_raw = [] ; 
+				  for($f=0;$f<19;$f++){
+					$cell_data = trim($objSheet->getCellByColumnAndRow($f,$row)->getValue());
+					$fail_raw[] = $f==2 && $cell_data ? date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($cell_data)) : $cell_data; 
+				  }
+				  
+                  if($orl_id_str=='' && !count(array_filter($fail_raw))){
+					$finish++;  
+				  }else{
+					$fail_sheet[] = $fail_raw;  
+				  }
+				  
+				  $row++;
+				  continue;
+				}
+				
+				$ethnic   = trim($objSheet->getCellByColumnAndRow( 6 ,$row)->getValue()) ? '漢人' : '';
+				$ethnic   = trim($objSheet->getCellByColumnAndRow( 7 ,$row)->getValue()) ? '原住民族' : $ethnic;
+				
+				$store_id = join('-',$new_id_set);
+				$store_no = 'BM'.str_pad($counter+1,8,'0',STR_PAD_LEFT);
 				
 				
+                $rowref     = $row+1;
+				do{
+				  $rowref--;	
+				  $remark   = trim($objSheet->getCellByColumnAndRow(9 ,$rowref)->getValue());
+				}while($remark=='同上'&& trim($objSheet->getCellByColumnAndRow(9 ,($rowref-1))->getValue()));				
+			
 				$db_insert->bindValue(':class'		, 'relic' );
 				$db_insert->bindValue(':zong'		, '001');
 				$db_insert->bindValue(':fonds'		, '館藏文物');
 				$db_insert->bindValue(':store_no'	, $store_no);
+				$db_insert->bindValue(':store_id'	, $store_id);
 				$db_insert->bindValue(':store_year'	, $new_id_set[0]);
 				$db_insert->bindValue(':store_type'	, $new_id_set[1]);
 				$db_insert->bindValue(':store_no1'	, $new_id_set[2]);
 				$db_insert->bindValue(':store_no2'	, $new_id_set[3]);
-				$db_insert->bindValue(':store_no3'	, $new_id_set[4]);
-				$db_insert->bindValue(':title'		, trim($objSheet->getCellByColumnAndRow( 3 ,$row)->getValue()));
-				$db_insert->bindValue(':categories'	, trim($objSheet->getCellByColumnAndRow( 5 ,$row)->getValue()));
-				$db_insert->bindValue(':size_info'	, trim($objSheet->getCellByColumnAndRow( 6 ,$row)->getValue()));
-				$db_insert->bindValue(':ethnic'		, trim($objSheet->getCellByColumnAndRow( 7 ,$row)->getValue()));
+				$db_insert->bindValue(':store_no3'	, isset($new_id_set[4]) ? $new_id_set[4] : '');
+				$db_insert->bindValue(':store_orl'	, $orl_id_str );
+				$db_insert->bindValue(':title'		, trim($objSheet->getCellByColumnAndRow( 4 ,$row)->getValue()));
+				$db_insert->bindValue(':categories'	, '' );
+				$db_insert->bindValue(':size_info'	, trim($objSheet->getCellByColumnAndRow( 5 ,$row)->getValue()));
+				$db_insert->bindValue(':ethnic'		, $ethnic);
 				$db_insert->bindValue(':period'		, trim($objSheet->getCellByColumnAndRow( 8 ,$row)->getValue()));
-				$db_insert->bindValue(':saved_year'	, trim($objSheet->getCellByColumnAndRow( 9,$row)->getValue()));
+				$db_insert->bindValue(':saved_year'	,  '');
 				$db_insert->bindValue(':acquire_type', '');
-				$db_insert->bindValue(':acquire_info', trim($objSheet->getCellByColumnAndRow(10 ,$row)->getValue()));
-				$db_insert->bindValue(':status_code', trim($objSheet->getCellByColumnAndRow( 11,$row)->getValue()));
-				$db_insert->bindValue(':status_descrip', trim($objSheet->getCellByColumnAndRow( 12 ,$row)->getValue()));
+				$db_insert->bindValue(':acquire_info', '');
+				$db_insert->bindValue(':status_code', trim($objSheet->getCellByColumnAndRow( 10,$row)->getValue()));
+				$db_insert->bindValue(':status_descrip', trim($objSheet->getCellByColumnAndRow( 11 ,$row)->getValue()));
 				
-				$store_date = trim($objSheet->getCellByColumnAndRow( 1,$row)->getValue());
+				$store_date = trim($objSheet->getCellByColumnAndRow( 2,$row)->getValue());
 				$store_date = strtotime($store_date) ? date('Y-m-d',strtotime($store_date)) : date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($store_date));
 				
 				$db_insert->bindValue(':store_date'	,$store_date);
-				$db_insert->bindValue(':store_location' , trim($objSheet->getCellByColumnAndRow(14 ,$row)->getValue()) ? trim($objSheet->getCellByColumnAndRow(14 ,$row)->getValue()) : '北投庫房' );
+				$db_insert->bindValue(':store_location' , trim($objSheet->getCellByColumnAndRow(13 ,$row)->getValue()) ? trim($objSheet->getCellByColumnAndRow(13 ,$row)->getValue()) : '北投庫房' );
 				
-				$db_insert->bindValue(':store_number' , trim($objSheet->getCellByColumnAndRow( 15,$row)->getValue()));
-				$db_insert->bindValue(':store_boxid'  , trim($objSheet->getCellByColumnAndRow( 13 ,$row)->getValue()));
-				$db_insert->bindValue(':remark'		, trim($objSheet->getCellByColumnAndRow(17 ,$row)->getValue()));
-				$db_insert->bindValue(':user'		, trim($objSheet->getCellByColumnAndRow(16 ,$row)->getValue()));
+				$db_insert->bindValue(':store_number' , trim($objSheet->getCellByColumnAndRow( 14,$row)->getValue()));
+				$db_insert->bindValue(':store_boxid'  , trim($objSheet->getCellByColumnAndRow( 15 ,$row)->getValue()));
+				$db_insert->bindValue(':store_boxidorl'  , trim($objSheet->getCellByColumnAndRow( 12 ,$row)->getValue()));
+				$db_insert->bindValue(':remark'		, $remark);
+				$db_insert->bindValue(':user'		, trim($objSheet->getCellByColumnAndRow(19 ,$row)->getValue()));
 				
 				
 				if(!$db_insert->execute()){
 				  throw new Exception('新增資料失敗'); 	
 				}
 				
-				echo "done.";
+				echo "done. \n";
 				$row++;
 				$counter++;
 				
@@ -111,9 +155,35 @@
 		  }
 	  }
 	  
+	  
 	  $objPHPExcel->disconnectWorksheets();  
 	  unset($objPHPExcel);
-    
+	  
+	  
+	  //匯出錯誤資料
+	  $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+	  $file_path  = dirname(__FILE__).'/rawdata/faildata/';
+	  $objPHPExcel = $objReader->load($file_path.'importfail.xlsx');
+	
+	  $objPHPExcel->setActiveSheetIndex(0);
+	  $objPHPExcel->getActiveSheet()->setTitle(date('Ymd')."匯入錯誤");
+		
+	  $col = 0 ;
+	  $row = 2 ;
+ 		
+	  foreach( $fail_sheet as $data){
+		  $col = 0;
+		  foreach($data as $f=>$v){
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($col, $row)->setValueExplicit($v, PHPExcel_Cell_DataType::TYPE_STRING);  	
+			$col++;
+		  }
+		  $row++;
+	  }
+	  $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+	  $objWriter->save($file_path.date('Ymd').'import_fail_'.count($fail_sheet).'.xlsx'); 
+	  $objPHPExcel->disconnectWorksheets();
+	  unset($objPHPExcel);
+	  
 	} catch (Exception $e) {
       echo $e->getMessage();
     }	

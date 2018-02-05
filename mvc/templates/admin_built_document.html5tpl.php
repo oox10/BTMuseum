@@ -327,7 +327,7 @@
 						  <?php $value_sets = explode(';',$fields_config['volume']['acquire_type']['pattern']);?>
 						  <ul class='value_set' >
 						  <?php foreach($value_sets as $item): ?> 
-						  <li> <input type='radio' class='_volume _variable _update' value='<?php echo $item; ?>' name='META-V-acquire_type' ><?php echo $item; ?></li>
+						  <li> <input type='radio' class='_volume _variable _update' value='<?php echo $item; ?>' name='META-V-acquire_type' <?php echo $meta_collect['META-V-acquire_type']==$item ? 'checked' :''; ?> ><?php echo $item; ?></li>
 						  <?php endforeach; ?>
 						  <li> 
 						    <input type='radio' class='_volume _variable _update' value='_newa' name='META-V-acquire_type' >
@@ -362,7 +362,7 @@
 						    title='破損嚴重，不可展覽' 
 						    <?php endif; ?>
 						  > 
-						    <input type='radio' class='_volume _variable _update' value='<?php echo $item; ?>' name='META-V-status_code' ><?php echo $item; ?>
+						    <input type='radio' class='_volume _variable _update' value='<?php echo $item; ?>' name='META-V-status_code' <?php echo $meta_collect['META-V-status_code']==$item ? 'checked' :''; ?>   ><?php echo $item; ?>
 						  </li>
 						  <?php endforeach; ?>
 						  <li> 

@@ -20,7 +20,7 @@
    
 	$file_allow = array('jpg','png','tiff','wmv','mp4','mp3');
 	
-	define('_SOURCE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/20180120/');
+	define('_SOURCE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/20180204/');
 	define('_STORE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH);
 	define('_SOURCE_UNPASER',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/unpaser/');
 	 
@@ -55,7 +55,9 @@
 		  $donumber = 0;	
 		}
 		
-		$do_name_set = explode('-',preg_replace('/(\s+)?(\(\d+\))?\.(JPG|jpg)/','',$dofile));  
+		$do_name_set = explode('-',preg_replace('/(\s+)?(\(\d+\))?\.(JPG|jpg)/','',$dofile));
+        
+		
 		$do_store_id = str_pad($do_name_set[0],3,'0',STR_PAD_LEFT).'-'.$do_name_set[1].'-'.str_pad($do_name_set[2],2,'0',STR_PAD_LEFT).'-'.str_pad($do_name_set[3],3,'0',STR_PAD_LEFT); 
 		
 		if(!isset($do_source_array[$do_store_id])) $do_source_array[$do_store_id] = [];
