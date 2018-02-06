@@ -23,8 +23,8 @@
 	
 	
 	// 查詢 system_info 表取得相關 info
-	public static function SEARCH_INDEX_GET_POST($Council='000'){
-	  $SQL_String = "SELECT * FROM system_post WHERE post_type=:post_type AND (post_to='#all' OR post_to='".$Council."') AND post_keep=1 AND ((post_time_start<NOW() AND post_time_end >= NOW() AND post_level >0 AND post_level<4 ) OR post_level=4  ) AND post_display=1 ORDER BY post_level DESC,post_time_start DESC";
+	public static function SELECT_INDEX_POSTS(){
+	  $SQL_String = "SELECT pno,post_type,post_from,post_level,post_time_start,post_title,post_content FROM system_post WHERE post_to='管理系統' AND post_display=1 AND post_keep=1 AND ( (NOW() BETWEEN post_time_start AND post_time_end ) OR post_level=4 ) ORDER BY post_level DESC,post_time_start DESC,pno DESC;";
 	  return $SQL_String;
 	}
 	
@@ -33,7 +33,7 @@
 	
 	// 查詢系統總資料空間
 	public static function SELECT_ALL_DATA_STORE(){
-	  $SQL_String = "SELECT EXTRACT(YEAR_MONTH FROM upload_date) AS stage,sum(image_size) as total_size,count(*) AS count ,classcode FROM metadata WHERE 1 GROUP BY stage ORDER BY stage ASC;";
+	  $SQL_String = "SELECT EXTRACT(YEAR_MONTH FROM _timeupdate) AS stage,sum(count_dofiles) as total_size,count(*) AS count ,fonds FROM source_digiarchive WHERE 1 GROUP BY stage ORDER BY stage ASC;";
 	  return $SQL_String;
 	}
 	
@@ -46,7 +46,17 @@
 	  return $SQL_String;
 	}
 	
+	//-- Client Post:  get post user select 
+	public static function GET_CLIENT_POST_TARGET(){
+	  $SQL_String = "SELECT pno,post_type,post_from,post_level,post_time_start,post_title,post_content,post_hits FROM system_post WHERE post_to IN('管理系統','所有系統') AND post_display=1 AND post_keep=1 AND ( (NOW() BETWEEN post_time_start AND post_time_end ) OR post_level=4 ) AND pno=:pno;";
+	  return $SQL_String;
+	}
 	
+	//-- Client Post:  update post hits 
+	public static function CLIENT_POST_HITS(){
+	  $SQL_String = "UPDATE system_post SET post_hits=(post_hits+1) WHERE pno=:pno;";
+	  return $SQL_String;
+	}
 	
   }
   

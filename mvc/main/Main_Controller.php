@@ -1,38 +1,39 @@
 <?php
   
-  
-  /********************************************* 
-  ***   ForestApply Admin Post Control Set   ***
-  *********************************************/
-	
   class Main_Controller extends Admin_Controller{
     
 	public function __construct(){
 	  parent::__construct();	
-      $this->Model = new Admin_Model;
+      $this->Model = new Main_Model;
 	}
 	
-	// PAGE: 管理訊息介面 O
+	// PAGE: 系統首頁
 	public function index(){
-	  
-	  self::redirectTo('index.php?act=Booking');
-	  exit(1);
-	  
-	  echo "<pre>";
-	  echo 'session admin USER:<br/>';
-	  var_dump(unserialize($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['USER']) );
-	 
-      echo '<br/><br/><br/>session admin PERMISSION:<br/>';
-	  var_dump($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['PERMISSION'] );
-	  
+	  $this->Model->GetUserInfo();
+	  $this->Model->Get_System_Information();
+	  $this->Model->Get_Post_List();
+	  self::data_output('html','admin_index',$this->Model->ModelResult);
 	}
+	
+	// PAGE: 權限不足
+	public function denial(){
+	  $this->Model->GetUserInfo();
+	  $this->Model->Get_System_Information();
+	  $this->Model->ModelResult['denial'] = array('action'=>false,'message'=>array('_SYSTEM_ERROR_PERMISSION_DENIAL'));
+	  self::data_output('html','admin_index',$this->Model->ModelResult);
+	}
+	
+	/***--- POST ACTION SET ---***/
+	// PAGE: get client announcement
+	public function getann($DataNo){   
+	  $this->Model->Get_Client_Post_Target($DataNo);
+	  self::data_output('json','',$this->Model->ModelResult);
+	}
+	
+	
 	
   }
-  
-  
-  
-  
-  
-?>
+
+?>  
 
 

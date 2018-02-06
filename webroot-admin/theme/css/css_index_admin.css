@@ -1,0 +1,302 @@
+
+ 
+
+
+		  div.search_block{
+			height: 40px;
+			line-height:40px;
+			align-items:center;
+			text-align:right;
+			display:inline-flex;
+			width:470px;
+		  }
+			.search_block > select#search_field{ border-right:0; border-radius:5px 0 0 5px; height:30px; flex:0 0 80px;}
+			.search_block > input[type=text]{ height:30px; flex:1 0 300px; }
+			.search_block > select#search_mode{border-left:0; border-radius:0 5px 5px 0; height:30px; flex:0 0 80px; margin-right:5px;}
+			.search_block > button{ width:20px; height:28px; flex:0 0 50px;}
+			
+		  span.mixbutton{
+			display:inline-block;
+			box-sizing:border-box; 	
+			width:32px;
+			height:32px;
+			line-height:30px;
+			border-radius:16px;
+			background-color:#dcdddd;
+			padding:0 7px;
+			margin-right:10px;
+		  }
+	  
+	  
+	  div.main_content{
+	    position:relative;
+	    padding:30px;
+	  }  
+	    div.data_record_block{
+		  background-color:#FFFFFF;
+		  padding:0 30px 20px;
+		  font-size:15px;
+		  margin-bottom:20px;
+		}
+	  
+	      div.record_header{
+		    position:relative;
+			height:50px;
+			line-height:50px;
+		    border-bottom: 2px solid #f5f5f5;
+		  }		
+	        span.record_name{
+			  
+			}
+			
+			span._return_list{
+			  cursor:pointer;
+			  text-decoration:underline;
+			}
+			
+			span.record_target{ color:#007bbb; }
+			span.record_target:before{ content:" / "; font-size:13px; color:#000000;}
+			
+			span.record_option{
+			  font-size:16;
+			  position:absolute;
+			  right:0;
+			}
+			
+			span.record_option a.option{
+			  padding-left:10px;
+			}  
+		  
+
+          div#system_dashboard{
+ 
+		  }
+		  div#system_dashboard{}  
+			
+			div#chart_container{
+			  height:250px;		
+			}
+			div.space_container{
+			  display:flex;	
+			}
+			div.space_container > div{ 
+			  width:33%; height:100px;
+			  box-sizing:border-box;
+			  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+              color:#FFFFFF;			  
+			  margin:10px 5px;
+			  padding:10px;
+			}  
+			
+			div.space_container > div > h1{ font-weight:bold; font-size:1.5em; margin-bottom:15px;}
+			div.space_container > div > .descrip{}
+			
+			div#space_used{ background-color:#EC407A;}
+			div#data_count{ background-color: #2196F3;	}
+			div#photo_rate{ padding:0;background-color:#e5e4e6; }
+			
+	      
+		#information_block{display:flex; justify-content:space-between;}
+		#information_block > div{flex:0 0 49%;}
+		  
+		  div#system_document{
+			min-height:250px;  
+		  }		
+			
+			div.document_block{
+			  display:inline-block;
+			  width:250px;
+              height:150px;			  
+			  border:1px #CDCDCD solid;
+			  margin:10px 5px;
+			  vertical-align:top;
+			  line-height:1.3em;
+			}
+			
+			.document_block > * { padding:5px; }
+			.document_block > h2{
+              font-weight:bold;			  
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+/* post list */ 
+	  .billboard{
+	    width:100%;
+      }
+  
+	  
+	  .billboard[more='0'] > .news_block > div:nth-child(n+6){ display:none; }
+	  .billboard[more='1'] > .news_block > div{ display:block; }
+	  
+	  .billboard #act_switch_post_mode{ font-family: monospace;}
+	  .billboard[more='0'] #act_switch_post_mode > i.hide{display:none;}
+	  .billboard[more='1'] #act_switch_post_mode > i.more{display:none;}
+	  
+	  
+	    .news_block{ }
+		  .post{
+			margin-bottom:10px;	
+			padding:10px;
+			border-bottom:1px #CDCDCD solid;
+			border-radius:5px;
+			position:relative;
+			cursor:pointer;
+		  }
+		  
+		  @keyframes myanimation {
+			0% { border-bottom:1px #CDCDCD solid; }
+			/*80%  { border:1px #e6b422 dotted; }*/
+			100% { border-bottom:1px #c9171e dashed; }
+		  }
+		   
+		  .post[top='1'] {
+			/* box-shadow: 0 1px 5px -1px rgba(0,0,0,0.3); */
+		  }  
+		   
+		  .post[mark='緊急通告'] {
+			animation: myanimation 0.5s 200; /* use myanimation 5s duration, 5 times */
+		  }
+		  
+		  .post > h2{ 
+			padding:5px 0;
+			position:relative;
+			display:flex;
+		  }
+		  
+		  .post > h2 > span{
+			display:inline-block;  
+		  }
+		  
+			.post_date{ 
+			  color:#eb6101;
+			}
+			.post_type{ margin:0 5px; font-weight:bold; }
+			.post_summary{  }
+			.post_organ{ 
+			  font-size:0.9em; 
+			  align-self:flex-end;
+			  flex:1;
+			  text-align:right;
+			}
+			
+			.post_rate{
+			  position:absolute; 
+			  display:block;
+			  width:0;
+			  height:22px;
+			  background-image:url(../image/mark_star.png);
+			  top:-21px;
+			  left:0;
+			  transform-origin:left;
+			  transform: scale(0.7);
+			}
+			
+		  div.post_content{
+			color:#595857;
+			display:none;
+		  }	
+/* [ LANDING POST POPOUT DOM ] */
+.system_announcement_area{
+  position:fixed;
+  top:10px; left:10px; right:10px; bottom:10px;	  
+  background-color:rgba(0,0,0,0.6);
+  display:none;
+  z-index:200;
+}
+  
+  .system_announcement_area > .container{
+	height:100%;  
+  }
+  
+  #announcement_block{
+	max-width:600px;  
+	height:80vh; /* fix IE11 */
+	min-height:80%;
+	margin:30px auto;  
+	background-color:#FFFFFF;
+	border-radius:5px;
+	display:flex;
+	flex-direction:column;
+	padding:0 10px ;
+  }
+
+  #announcement_block > h1{
+	position:relative;
+    flex:0 0 50px;
+  } 
+
+  #announcement_block > h1 > span.ann_close{
+	position:absolute;
+	right:10px;
+	top:10px;
+	font-size:1.5em;		
+  }
+  
+	.ann_header{
+	  display:flex; 
+	  align-items:flex-start;
+	  border-bottom:1px #cdcdcd solid;
+	  padding:10px 0;
+	}
+	  
+	  .ann_type{
+		font-size:0.9em;
+		padding:5px;
+		background-color:green;
+		color:#FFFFFF;
+		border-radius:5px;
+		width:80px;
+		text-align:center;
+	  }
+	  
+	  .ann_title{
+		flex:1;  
+		font-weight:bold;
+		font-size:1.1em;
+		padding:0 40px 0 10px;
+		min-height:20px;
+		line-height:1.2em;
+	  } 
+
+	.ann_contents{
+	  flex:1;
+      padding:15px 0;
+	  overflow-y:auto;
+	}
+	
+	.ann_contents > p{
+	  font-size:1em;
+	  line-height:1.5em; 
+	}
+	
+	
+	.ann_footer{
+	  border-top:1px #CDCDCD solid;
+	  display:flex;
+	  justify-content:space-between;
+	  align-items:center;
+	  font-size:0.8em;
+	  color:#7d7d7d;
+	  height:50px;
+	  flex:0 0 50px;
+	} 
+	  .ann_counter{
+		font-weight:bold;
+		font-size:2em;
+		padding-right:20px;
+	  }     
+				
+			
+			
+			
+			
+			
+			
+			
+			
