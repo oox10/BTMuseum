@@ -1,5 +1,4 @@
 TODO:
-
 單件新增
 批次匯入
 修改影像類型
@@ -11,5 +10,4 @@ display ?
 影像資料夾
 
 [viewer] 
-download browse picture
 resize rescale

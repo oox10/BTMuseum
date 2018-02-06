@@ -275,6 +275,7 @@
 		.term_info > i{
 		  position:absolute;
           right:0;
+		  top:25%;
           font-size:10px;		  
 		}
 	    
