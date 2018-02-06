@@ -1124,7 +1124,7 @@
 		while($meta = $DB_GET->fetch(PDO::FETCH_ASSOC)){
 		  $source_meta = json_decode($meta['source_json'],true);
 		  $print_meta = []; 
-		  $print['thumb']  = 'thumb.php?src='.$source_meta['collection']['zong'].'/thumb/'.$source_meta['collection']['store_no'].'/'.($source_meta['collection']['cover_page'] ? $source_meta['collection']['cover_page']:$source_meta['collection']['store_no'].'-001.jpg');
+		  $print['thumb']  = 'thumb.php?src='.$source_meta['collection']['zong'].'/thumb/'.$source_meta['collection']['store_no'].'/'.($source_meta['collection']['cover_page'] ? $source_meta['collection']['cover_page']:$source_meta['collection']['store_no'].'-002.jpg');
 		  $print['header'] = $source_meta['collection']['store_id'].' / '.$source_meta['collection']['title'];
 		  $print['fields'] = [];
 		  foreach($data_export_package['pfields'] as $pfield){
