@@ -766,6 +766,9 @@
 	  var new_element = $('tr._record_template').clone();
 	  new_element.removeClass('_record_template').attr('no','_addnew');
 	  new_element.appendTo('.data_result');
+	  
+	  $('#record_member').css('display','flex');
+	  
 	});
 	
 	
@@ -991,7 +994,6 @@
 	  var new_element = $('tr._record_template').clone();
 	  new_element.removeClass('_record_template').attr('no','_addnew');
 	  new_element.appendTo('.data_result').trigger('click'); 
-	  
 	  
 	});
 	

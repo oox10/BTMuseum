@@ -1806,7 +1806,8 @@
 			        'file' => $do,
 				    'width'=> $imgw,
 			        'height'=> $imgh,
-				    'size'=> filesize($digital_object_path.$do)
+				    'size'=> filesize($digital_object_path.$do),
+					'dotype'=>'整理照'
 			      ]; 
 				  break;
 				case 'mp3':

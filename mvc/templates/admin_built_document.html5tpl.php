@@ -471,7 +471,7 @@
 								  <td title='狀態'	align='center'	>狀態</td>
 								</tr>   
 								 
-								<tr class='data_record _record_template ' id='' no='' page='' mode='edit' >
+								<tr class='data_record _element_read _record_template ' id='' no='' page='' mode='edit' >
 									<td filed='no' >new</td>
 									<td filed='META-E-store_no'> </td>
 									<td filed='META-E-dotype'> </td>

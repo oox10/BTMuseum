@@ -8,7 +8,7 @@
   require_once(dirname(dirname(__FILE__)).'/conf/system_config.php');
   session_start();
   if(isset($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['LOGIN_TOKEN'])){
-	$photo_location = file_exists(_SYSTEM_DIGITAL_FILE_PATH.$_REQUEST['src']) ? _SYSTEM_DIGITAL_FILE_PATH.$_REQUEST['src'] :_SYSTEM_ROOT_PATH.'systemFiles/photo_error.png';
+	$photo_location = is_file(_SYSTEM_DIGITAL_FILE_PATH.$_REQUEST['src']) ? _SYSTEM_DIGITAL_FILE_PATH.$_REQUEST['src'] :_SYSTEM_ROOT_PATH.'systemFiles/photo_error.png';
 	ob_get_clean();
 	header('Content-Type: '.mime_content_type($photo_location));
 	readfile($photo_location);  
