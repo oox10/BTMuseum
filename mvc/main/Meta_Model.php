@@ -390,8 +390,8 @@
 			$result_source[$key]['_source'] = json_decode($meta['search_json'],true); 
 			$result_source[$key]['_db']['@time'] = $meta['@time'];
 			$result_source[$key]['_db']['@user'] = $meta['@user'];
-			$result_source[$key]['_db']['_count_element'] = $source['collection']['_count_element'];
-			$result_source[$key]['_db']['_count_dofiles'] = $source['collection']['_count_dofiles'];
+			$result_source[$key]['_db']['count_element'] = $source['collection']['count_element'];
+			$result_source[$key]['_db']['count_dofiles'] = $source['collection']['count_dofiles'];
 			$work_folder[] = $key;
 		  }
 		  $folder[$fid]['result'] = $result_source;
@@ -1148,6 +1148,31 @@
 	
 	
 	 
+	//-- Admin Folder Create New Folder 
+	// [input] : FolderId     :  folder id ;
+	// [input] : FolderQueue  :  $_SESSION[][]
+	public function ADMeta_Folder_Switch($FolderId='', $FolderQueue=[]){
+	  $result_key = parent::Initial_Result('folder');
+	  $result  = &$this->ModelResult[$result_key];
+	  try{  
+		// 確認資料夾是否存在
+		if(!isset($FolderQueue[$FolderId])){
+		  throw new Exception('_META_FOLDER_CONFIG_UNDEFIND');		  	
+		}
+		
+		$FolderQueue['_focus'] = $FolderId;
+		
+		// final
+		$result['action'] = true;
+	    $result['session']['_ADMETA_FOLDERS'] = $FolderQueue;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;  
+	}
+	
+	
 	//-- Admin Folder Create New Folder 
 	// [input] : FolderPackageEncode  :  base encode array [ name=>,records=>[] ]  ;
 	// [input] : FolderQueue          :  $_SESSION[][]

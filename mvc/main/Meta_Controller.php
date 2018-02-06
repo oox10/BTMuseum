@@ -70,6 +70,8 @@
 	}
 	
 	
+	
+	
 	/* [ 新增文物資料 ] */
 	
 	// AJAX: 新增文物
@@ -129,10 +131,6 @@
 	  $this->Model->ADMeta_Folder_Remark($FolderEncodeString);
 	  self::data_output('json','',$this->Model->ModelResult);
 	}
-	
-	
-	 
-	 
 	 
 	 
 	

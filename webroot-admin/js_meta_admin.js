@@ -161,6 +161,332 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	});
 	
 	
+	
+	/***== [ META FOLDER AD FUNCTION ] ==***/ //資料夾管理介面
+	//------------------------------------------------------------------------------------------------------
+	
+	
+	//-- create new folder 新增資料夾
+	$('#act_create_folder').click(function(){
+	  
+      if(!$("li.rsettag[data-folder='myfolder']").length){
+		system_message_alert('','尚未開放');  
+	    return false;
+	  }
+	  if($("li.rsettag[mode='init']").length){
+		system_message_alert('','請先儲存先前新增之資料夾');  
+	    return false;
+	  }  
+	  if($('li.rsettag').length >4 ){
+		system_message_alert('','超過資料夾上限!!');  
+	    return false;  
+	  }
+	  var newfoldertag = $("li.rsettag[data-folder='myfolder']").clone();
+      newfoldertag.attr({'mode':'init','data-folder':'newfolder'}).removeClass('_atthis');
+	  newfoldertag.find('label').prop('contenteditable',true);
+	  newfoldertag.insertBefore($(this));
+	});
+	
+	//-- attach orl folder 進入資料夾
+	$(document).on('click','.act_attach_folder',function(){
+	  var main_tags = $(this).parents('li.rsettag');
+	  
+	  if(main_tags.attr('mode')!='save'){
+		return true;
+	  }
+	  
+	  if($('.record_folder#'+main_tags.data('folder')).length){
+		$('.record_folder').hide();  
+		$('.record_folder#'+main_tags.data('folder')).show();  
+	  }
+	  
+	  // active ajax
+	  $.ajax({
+		url: 'index.php',
+		type:'POST',
+		dataType:'json',
+		data: {act:'Meta/folderatt/'+main_tags.data('folder')},
+		beforeSend: function(){  system_loading(); },
+		error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+		success: 	function(response) {
+		  if(response.action){
+			$('.rsettag._atthis').removeClass('_atthis');
+	        main_tags.addClass('_atthis');
+		  }else{
+			system_message_alert('',response.info);
+		  }
+		},
+		complete:	function(){  }
+	  }).done(function(r) {  system_loading(); }); 
+	  
+	});
+	
+	//-- remove id from folder 移出資料夾
+	$(document).on('click','.act_folder_out',function(){
+	  
+	  var main_tag   = $('.rsettag._atthis');
+	  var main_record= $(this).parents('.data_record');
+	  
+	  var folder     = {};
+	  folder['ticket']  = main_tag.attr('data-folder'); 
+	  folder['name']    = main_tag.find('label').text(); 
+	  folder['records'] = [main_record.attr('no')]; 
+	  
+	  var paser_data = encodeURIComponent(Base64M.encode(JSON.stringify(folder)));
+	  
+	  // active ajax
+	  $.ajax({
+		url: 'index.php',
+		type:'POST',
+		dataType:'json',
+		data: {act:'Meta/folderout/'+paser_data},
+		beforeSend: function(){  system_loading(); },
+		error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+		success: 	function(response) {
+		  if(response.action){
+			main_tag.find('.set_counter').text(response.data.folder.count);
+		    main_record.remove();
+		  }else{
+			system_message_alert('',response.info);
+		  }
+		},
+		complete:	function(){  }
+	  }).done(function(r) {  system_loading(); }); 
+	  
+	});
+	
+	
+	
+	//-- active folder 針對資料夾動作處理  insert / create
+	$(document).on('click','.act_active_folder',function(){
+	  var main_tag   = $(this).parents('li.rsettag');
+	  var folder     = {};
+	  folder['ticket']  = main_tag.attr('data-folder'); 
+	  folder['name']    = main_tag.find('label').text(); 
+	  folder['records'] = []; 
+	  
+	  var paser_data = encodeURIComponent(Base64M.encode(JSON.stringify(folder)));
+	  
+	  switch( main_tag.attr('mode')){
+		
+		case 'init':  //儲存新資料夾
+         
+		  // active ajax
+		  $.ajax({
+			url: 'index.php',
+			type:'POST',
+			dataType:'json',
+			data: {act:'Meta/foldernew/'+paser_data},
+			beforeSend: function(){  system_loading(); },
+			error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+			success: 	function(response) {
+			  if(response.action){
+				
+				// 新增資料列表區塊
+                if(!$('#myfolder').length){
+				  system_message_alert('','模組尚未開放');	
+				  return true;
+				}                  
+                
+				var new_folder_dom = $('#myfolder').clone() 				
+                new_folder_dom.attr('id',response.data.folder.ticket).css('display','none');
+                new_folder_dom.find('.data_result').empty();
+				new_folder_dom.find('.folder_remark').val('');
+				new_folder_dom.appendTo('.record_body');
+				
+				// 新增批次處理選單項目
+                $('#folder_list').append("<option value='folder' f='"+response.data.folder.ticket+"'>加入 - "+response.data.folder.name+"</option>");
+                
+				// 更改標籤狀態                
+				main_tag.attr({'mode':'save','data-folder':response.data.folder.ticket});
+				main_tag.find('label').prop('contenteditable',false);
+				main_tag.find('.set_counter').text(0);
+				
+				
+			  }else{
+				system_message_alert('',response.info);
+			  }
+			},
+			complete:	function(){  }
+		  }).done(function(r) {  system_loading(); }); 
+		  break; 
+		
+        case 'save':  //勾選資料 放入 / 移出
+          
+		  if( !$('#'+folder['ticket']).length ){
+			system_message_alert("","資料夾不存在");  
+		  }
+		  
+		  // 取得目前勾選資料
+		  var master_records = $('.record_folder:visible');
+		  if(!master_records.find('.act_selector:checked').length){
+			system_message_alert("","尚未勾選資料");    
+		  }
+		  
+		  folder['records']= master_records.find('.act_selector:checked').map(function(){return $(this).val(); }).get();
+		  paser_data = encodeURIComponent(Base64M.encode(JSON.stringify(folder)));
+		  
+		  var active = (main_tag.hasClass('_atthis')) ? 'folderout':'folderadd';
+		  var method = (main_tag.hasClass('_atthis')) ? '移出':'加入';
+		  
+		  if(!confirm("請問確認要將勾選之 "+folder['records'].length+" 筆資料 "+method+"《"+folder['name'] +"》嗎?")){
+			return false;  
+		  }
+		  
+		  // active ajax
+		  $.ajax({
+			url: 'index.php',
+			type:'POST',
+			dataType:'json',
+			data: {act:'Meta/'+active+'/'+paser_data},
+			beforeSend: function(){  system_loading(); },
+			error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+			success: 	function(response) {
+			  if(response.action){
+				
+				var record_table = $('#'+folder['ticket']).find('.data_result');
+				var record_count = record_table.find('.act_selector').length;
+				
+				if(active=='folderadd'){
+				  $.each(response.data.folder.newadd,function(i,sid){
+				    var folder_new_record = master_records.find(".data_record[no='"+sid+"']").clone();
+				    folder_new_record.find('.act_selector').prop('checked',false);
+					folder_new_record.find('.act_meta_getin').before("<button type='button' class='cancel act_folder_out' title='移出資料夾' ><i class='fa fa-ban' aria-hidden='true'></i></button>");
+				    record_table.append(folder_new_record);
+				  });
+				}else{
+				  $.each(folder['records'],function(i,sid){
+				    master_records.find(".data_record[no='"+sid+"']").remove();
+				  });	
+				}
+				
+				main_tag.find('.set_counter').text(response.data.folder.count);
+				system_message_alert('alert','已將勾選之'+folder['records'].length+'筆資料 '+method+' ['+folder['name']+']')
+			  
+			  }else{
+				system_message_alert('',response.info);
+			  }
+			},
+			complete:	function(){  }
+		  }).done(function(r) {  system_loading(); }); 
+		  break; 
+		  
+		  
+		  
+		  
+		  break;
+		  
+		
+		case 'dele':  //執行刪除 
+		  
+		  if(!confirm("確定要刪除此工作區\n確定後資料夾將會被移除!!?")){
+			return false;  
+		  }
+		  
+		  // active ajax
+		  $.ajax({
+			url: 'index.php',
+			type:'POST',
+			dataType:'json',
+			data: {act:'Meta/folderdel/'+paser_data},
+			beforeSend: function(){  system_loading(); },
+			error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+			success: 	function(response) {
+			  if(response.action){
+				
+				// 移除選單項目
+                $('#folder_list').find("option[value='folder'][f='"+folder['ticket']+"']").remove();
+				
+				// 移除資料列表區塊
+				if( $('#'+folder['ticket']).length ){
+				  $('#'+folder['ticket']).remove(); 
+				}                  
+                // 移除標籤                
+				main_tag.remove();
+				
+				$('#default_tag').find('label').trigger('click');
+				
+				
+			  }else{
+				system_message_alert('',response.info);
+			  }
+			},
+			complete:	function(){  }
+		  }).done(function(r) {  system_loading(); }); 
+		  break; 
+		  
+		  break;
+		
+		default: 
+		  system_message_alert('','未知的資料夾功能');
+		  break;  
+	  }
+	  
+	});
+	
+	
+	
+	
+	//-- remove old folder 取消資料夾
+	$(document).on('click','.act_remove_folder',function(){
+	  
+	  var main_tag   = $(this).parents('li.rsettag');
+	  var folder     = {};
+	  folder['name'] = main_tag.find('label').text(); 
+	  
+	   switch( main_tag.attr('mode')){
+		
+		case 'init':  //刪除尚未儲存的資料夾
+		  if(!confirm("確定要刪除新增資料夾??")){
+			return false;  
+		  }
+		  main_tag.remove();
+		  break;
+		
+		case 'save':  //刪除已儲存的資料夾，轉變狀態
+		  main_tag.attr('mode','dele');
+		  break;
+		  
+		case 'dele':  //復原刪除
+          main_tag.attr('mode','save');
+		  break		
+		  
+		default: 
+		  system_message_alert('','未知的資料夾功能');
+		  break;  
+		
+	   }
+	  
+	  
+	});
+	
+    //-- auto save work remark 自動儲存目前工作備註 
+	$(document).on('change','.folder_remark',function(){
+      var main_tag   = $('.rsettag._atthis');
+	  var folder     = {};
+	  folder['ticket']  = main_tag.attr('data-folder'); 
+	  folder['remark']  = $(this).val(); 
+      
+	  var paser_data = encodeURIComponent(Base64M.encode(JSON.stringify(folder)));
+	  
+	  // active ajax
+	  $.ajax({
+		url: 'index.php',
+		type:'POST',
+		dataType:'json',
+		data: {act:'Meta/foldernote/'+paser_data},
+		beforeSend: function(){ },
+		error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+		success: 	function(response) {
+		  if(!response.action){
+			system_message_alert('',response.info);
+		  }
+		},
+		complete:	function(){  }
+	  }).done(function(r) {  }); 
+	  
+	});
+	
 	 
 	
 	
@@ -169,17 +495,20 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	
 	//-- record select all 全選本頁
 	if($('.act_select_all').length){
+	 
 	  $('.act_select_all').change(function(){
-		$('.act_selector').prop('checked',$(this).prop('checked')); 
+		var master_table = $(this).parents('.record_list');	  
+		master_table.find('.act_selector').prop('checked',$(this).prop('checked')); 
 	  });
+	
 	}
 	
 	//-- record select one 單選本頁
 	$('.act_selector').click(function(){
+	  var master_table = $(this).parents('.record_list');
 	  var select_all_fleg = $('.act_selector').length == $('.act_selector:checked').length ? true : false;
-	  $('.act_select_all').prop('checked',select_all_fleg);  	
+	  master_table.find('.act_select_all').prop('checked',select_all_fleg);  	
 	});
-	
  
 	
 	
@@ -194,9 +523,24 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	  var act_action = $('#act_record_batch_to').val();
 	  var act_name   = $("#act_record_batch_to").find("option[value='"+act_action+"']").html();
 	  var act_info   = $("#act_record_batch_to").find("option[value='"+act_action+"']").attr('title');
-	  var records    = $('.act_selector:checked').map(function(){return $(this).val(); }).get();
+	  var master_records = $('.record_folder:visible');
+	  var records    = master_records.find('.act_selector:checked').map(function(){return $(this).val(); }).get();
 	  
 	  switch(act_action){
+		
+		case 'folder': 
+		  if(!records.length){
+		    system_message_alert('','尚未選擇資料');  
+	        return false;
+	      }
+		  var folder_id = $('#act_record_batch_to').find('option:selected').attr('f');
+	      if($("li.rsettag[data-folder='"+folder_id+"']").length){
+			$("li.rsettag[data-folder='"+folder_id+"']").find('.act_active_folder').trigger('click');  
+		  }
+		  
+		  
+		  break;
+		
 		case 'export':  //資料匯出
           if(!records.length){
 		    system_message_alert('','尚未選擇資料');  
@@ -690,6 +1034,23 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	  $(this).parents('.system_popout_area').hide();
       resetmoduleform($(this).data('form'));
 	});
+	
+	function resetmoduleform(FormClass){
+	  if(FormClass){
+		var bind_form = FormClass;
+        $('.'+bind_form+'._variable').each(function(){
+		  if( $(this).hasClass('_update')){
+			if($(this).attr('type') !='checkbox' && $(this).attr('type') !='radio'){
+			  $(this).val('');  	
+			}else{
+			  $(this).prop('checked',false);	
+			}
+		  }else{
+			$(this).html('');   
+		  }
+		});
+	  }
+	}
 	
 	
 	/***== [ META Zong AD FUNCTION ] ==***/ //全宗資料管理介面

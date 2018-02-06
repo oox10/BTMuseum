@@ -63,6 +63,11 @@
 	
     $meta_edit_flag = intval($user_info['user']['user_roles']['R00']) || intval($user_info['user']['user_roles']['R02']) ? 1 : 0;     // 是否可修改資料
 	
+	//user folder   
+	$user_folders   = isset($this->vars['server']['data']['folder']) 		? $this->vars['server']['data']['folder']:[];  
+	 
+	
+	
 	?>
   </head>
   
@@ -207,7 +212,31 @@
 		  <!-- 資料列表區 -->
 		  <div class='data_record_block' id='record_selecter' >
 		    <div class='record_header'>
-			  <span class='record_name'>資料列表</span>
+			  <ul id='record_set_switcher'>
+			    <li class='rsettag _atthis' data-folder='search' mode='save' id='default_tag' > 
+				  <label class='act_attach_folder' >資料清單</label> 
+				</li>
+				<?php if(count($user_folders)): ?>
+				<?php   foreach($user_folders as $fid=>$folder): ?>
+				<li class='rsettag' data-folder='<?php echo $fid;?>' mode='save' >
+				  <a class='option act_remove_folder'>
+				    <i class="fa fa-times" aria-hidden="true" title='刪除資料夾'></i>
+				    <i class="fa fa-reply" aria-hidden="true" title='還原刪除'></i>
+				  </a>
+				  <label class='act_attach_folder' > <?php echo $folder['name'];?> </label>
+				  <a class='option act_active_folder' >
+				    <i class='set_counter'  ><?php echo count($folder['result']);?></i>
+				    <i class="fa fa-cart-arrow-down" aria-hidden="true" title='加入資料夾'></i>
+					<i class="fa fa-arrow-up" aria-hidden="true" title='移出資料夾'></i>
+                    <i class="fa fa-floppy-o" aria-hidden="true" title='儲存' ></i>
+				  </a>
+				</li>  
+				<?php   endforeach; ?>
+				<?php endif; ?>
+				 
+				<li class='rsetadd' id='act_create_folder' title='新增工作區' ><a class='option'><i class="fa fa-plus" aria-hidden="true"></i></a></li>
+			  </ul>
+			  
 			  <span class='record_option'>
 			    <label>批次處理：</label>
 				<select id='act_record_batch_to'>
@@ -216,7 +245,13 @@
 					<option value='import'   title='回傳更新'     disabled >批次匯入-尚未開放</option>
 					<option value='print' title='勾選匯出報表' >列印報表</option>
 				  </optgroup>
-				  
+				  <optgroup label='創建群組' id='folder_list' >
+				    <?php if(count($user_folders)): ?>
+				    <?php   foreach($user_folders as $fid=>$folder): ?>
+				    <option value='folder' f='<?php echo $fid;?>' >加入 - <?php echo $folder['name']; ?> </option>
+				    <?php   endforeach; ?>
+				    <?php endif; ?>
+				  </optgroup>
 				  <!--
 				  <?php if($meta_edit_flag): ?>
 				  <optgroup label='資料設定' >
@@ -234,173 +269,274 @@
 			  </span>
 			</div> 
 			<div class='record_body'>
-		      <div class='record_control'>
-			    <span class='record_limit'>  
-			      每頁 :
-				  <select class='record_pageing' >
-				    <option value='1-20'   <?php echo $data_pageing=='1-20'? 'selected':''; ?> > 20 </option>
-				    <option value='1-50'   <?php echo $data_pageing=='1-50'? 'selected':''; ?> > 50 </option>
-					<option value='1-100'  <?php echo $data_pageing=='1-100'? 'selected':''; ?> > 100 </option>
-				    <option value='_all' <?php echo $data_pageing=='_all'? 'selected':''; ?> > 全部 </option>
-				  </select> 筆
-				  / 共 <span> <?php echo $data_count; ?></span>  筆
-			    </span>
-			    <span class='record_pages'>
-				  <a class='page_tap page_to' page='<?php echo $page_conf['prev'];?>' > &#171; </a>
-				  <span class='page_select'>
-				  <?php foreach($page_conf['list'] as $p=>$limit ): ?>
-				  <a class="page_tap <?php echo $p==$page_conf['now'] ? 'page_now':'page_to'; ?>" page="<?php echo $limit;?>" ><?php echo $p; ?></a>
-				  <?php endforeach; ?>
-				  </span>
-				  <a class='page_tap page_to' page='<?php echo $page_conf['next'];?>' > &#187; </a>
-				  ，跳至
-				  <select class='page_jump'>
-				    <optgroup label="首尾頁">
-					  <option value='<?php echo $page_conf['top'];?>' >首頁</option>
-					  <option value='<?php echo $page_conf['end'];?>' >尾頁</option>
-					</optgroup>
-					<optgroup label="-">
-					  <?php foreach($page_conf['jump'] as $p=>$limit ): ?>
-				      <option value="<?php echo $limit; ?>"  <?php echo $p==$page_conf['now'] ? 'selected':''; ?> ><?php echo 'P.'.$p; ?></option>
-				      <?php endforeach; ?>
-                    </optgroup>					  
-				  </select>
-				</span>
-			  </div>
-			  <div class='record_content' >
-			      <div class='record_arrange'>
-				  <?php foreach($data_pterm as $tfild => $terms): ?>
-				    <?php if(count($terms)): ?>
-					<h1>
-					  <span><?php echo isset($post_query_fields[$tfild]) ? $post_query_fields[$tfild] : '欄位統計'; ?> </span>
-					  <i>：<?php echo count($terms); ?> 項</i>
-					</h1>
-					<ul class='term_filter'>
-					<?php foreach($terms as $t): ?>  
-				      <li class='term_info ' >
-					    <input type='checkbox' 
-						       class='pqterm'  
-							   name='<?php echo $tfild?>' 
-							   value='<?php echo $t['key'];?>' 
-							   <?php echo isset($data_filter['pquery'][$tfild])&&in_array($t['key'],$data_filter['pquery'][$tfild]) ?  'checked':''?>   
-					    > 
-						<span><?php echo $t['key'];?></span>
-						<i><?php echo $t['doc_count'];?></i>
-					  </li>
-					<?php endforeach; ?>
-				    </ul>
-					<?php endif; ?>
-				  <?php endforeach; ?>
+		      
+			    <div class='record_folder' id='search' > <!-- 主要資料表 --> 
+			  
+				  <div class='record_control'>
+					<span class='record_limit'>  
+					  每頁 :
+					  <select class='record_pageing' >
+						<option value='1-20'   <?php echo $data_pageing=='1-20'? 'selected':''; ?> > 20 </option>
+						<option value='1-50'   <?php echo $data_pageing=='1-50'? 'selected':''; ?> > 50 </option>
+						<option value='1-100'  <?php echo $data_pageing=='1-100'? 'selected':''; ?> > 100 </option>
+						<option value='_all' <?php echo $data_pageing=='_all'? 'selected':''; ?> > 全部 </option>
+					  </select> 筆
+					  / 共 <span> <?php echo $data_count; ?></span>  筆
+					</span>
+					<span class='record_pages'>
+					  <a class='page_tap page_to' page='<?php echo $page_conf['prev'];?>' > &#171; </a>
+					  <span class='page_select'>
+					  <?php foreach($page_conf['list'] as $p=>$limit ): ?>
+					  <a class="page_tap <?php echo $p==$page_conf['now'] ? 'page_now':'page_to'; ?>" page="<?php echo $limit;?>" ><?php echo $p; ?></a>
+					  <?php endforeach; ?>
+					  </span>
+					  <a class='page_tap page_to' page='<?php echo $page_conf['next'];?>' > &#187; </a>
+					  ，跳至
+					  <select class='page_jump'>
+						<optgroup label="首尾頁">
+						  <option value='<?php echo $page_conf['top'];?>' >首頁</option>
+						  <option value='<?php echo $page_conf['end'];?>' >尾頁</option>
+						</optgroup>
+						<optgroup label="-">
+						  <?php foreach($page_conf['jump'] as $p=>$limit ): ?>
+						  <option value="<?php echo $limit; ?>"  <?php echo $p==$page_conf['now'] ? 'selected':''; ?> ><?php echo 'P.'.$p; ?></option>
+						  <?php endforeach; ?>
+						</optgroup>					  
+					  </select>
+					</span>
 				  </div>
-			  
-				  <table class='record_list' id='tasks_list'>
-					<tr class='data_field'>
-					  <td title='no'	><input type='checkbox' class='act_select_all'  >no.</td>
-					  <td title='縮圖'	>縮圖</td>
-					  <td title=''		>典藏號</td>
-					  <td title=''		>名稱</td>
-					  <td title=''		>存放位置</td>
-					  <td title=''		>圖檔</td>
-					  <td title=''		>入庫時間</td>
-					  <td title=''		align=center ><button type='button' class='active' id='act_volume_create' ><i class="fa fa-plus" aria-hidden="true"></i></option></td>
-					</tr>
-					<tbody class='data_result' mode='list' >   <!-- list / search--> 
-					<?php foreach($data_list as $i=>$data): ?>  
-					  
-					  <?php if($data['_source']['data_type']=='collection'): ?>
-					  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
-						<?php //處理搜尋標示 
-						$data_display = $data['_source'];
-						$pattern = array();
-						if(count($data_termhit)){    
-						  foreach($data_termhit as $term){
-							$pattern = '@('.preg_quote($term).')@u';  
-						  }		
-						}
-						foreach($data_display as $key => $meta){
-						  if(is_array($meta)) $meta = join('；',$meta);  
-						  $data_display[$key] = count($pattern) ? preg_replace($pattern,'<hit>\\1</hit>',$meta) : $meta;
-						}
-						?>
-						<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
-						<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['collection'];?>-002.jpg' /></td>
-						<td class='meta_id'><?php echo $data_display['store_id'];?></td>
-						<td class='meta_title'><?php echo $data_display['title'];?></td>
-						<td class='meta_store'><?php echo $data_display['store_location'];?> / <?php echo $data_display['store_number'];?> / <?php echo $data_display['store_boxid'];?></td>
-						<td class='meta_donum'><?php echo $data_display['count_dofiles'];?></td>
-						<td class='meta_saved'><?php echo $data_display['store_date'];?></td>
-						<td class='meta_option'>
-						  <button type='button' class='active act_meta_getin' flag-editable='<?php echo $meta_edit_flag;?>'>
-							<span class='act_editable'  ><i class="fa fa-pencil" aria-hidden="true"></i> 編輯</span> 
-							<span class='act_viewable'  ><i class="fa fa-eye" aria-hidden="true"></i> 檢視</span>
-						  </button>
-						</td>			   
-					  </tr> 
-					  
-					  
-					  <?php else: //影像 ?>
-					  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
-						<?php //處理搜尋標示 
-						$data_display = $data['_source'];
-						$pattern = array();
-						if(count($data_termhit)){    
-						  foreach($data_termhit as $term){
-							$pattern = '@('.preg_quote($term).')@u';  
-						  }		
-						}
-						foreach($data_display as $key => $meta){
-						  if(is_array($meta)) $meta = join('；',$meta);  
-						  $data_display[$key] = count($pattern) ? preg_replace($pattern,'<hit>\\1</hit>',$meta) : $meta;
-						}
-						?>
-						<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
-						<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['identifier'];?>.jpg' /></td>
-						<td class='meta_id'><?php echo $data['_source']['store_id'];?></td>
-						<td class='meta_title'><?php echo $data['_source']['title'];?></td>
-						<td class='meta_store'><?php echo $data['_dbsource']['collection']['store_location'];?> / <?php echo $data['_dbsource']['collection']['store_number'];?> / <?php echo $data['_dbsource']['collection']['store_boxid'];?></td>
-						<td class='meta_donum'> 1 </td>
-						<td class='meta_saved'><?php echo $data['_dbsource']['collection']['store_date'];?></td>
-						<td class='meta_option'>
-						  <button type='button' class='active act_meta_getin' flag-editable='<?php echo $meta_edit_flag;?>'>
-							<span class='act_editable'  ><i class="fa fa-pencil" aria-hidden="true"></i> 編輯</span> 
-							<span class='act_viewable'  ><i class="fa fa-eye" aria-hidden="true"></i> 檢視</span>
-						  </button>
-						</td>			   
-					  </tr> 
-					  <?php endif; ?>
-                      					
-					<?php endforeach; ?>
-					</tbody>
-				  </table>
-			  
-			  </div>
-			  <div class='record_control'>
-			    <span class='record_result'>  
-			      顯示 <span> <?php echo $data_pageing; ?> </span> /
-				  共 <span> <?php echo $data_count; ?></span>  筆
-				</span>
-				<span class='record_pages'>
-				  <a class='page_tap page_to' page='<?php echo $page_conf['prev'];?>' > &#171; </a>
-				  <span class='page_select'>
-				  <?php foreach($page_conf['list'] as $p=>$limit ): ?>
-				  <a class="page_tap <?php echo $p==$page_conf['now'] ? 'page_now':'page_to'; ?>" page="<?php echo $limit;?>" ><?php echo $p; ?></a>
-				  <?php endforeach; ?>
-				  </span>
-				  <a class='page_tap page_to' page='<?php echo $page_conf['next'];?>' > &#187; </a>
-				  ，跳至
-				  <select class='page_jump'>
-				    <optgroup label="首尾頁">
-					  <option value='<?php echo $page_conf['top'];?>' >首頁</option>
-					  <option value='<?php echo $page_conf['end'];?>' >尾頁</option>
-					</optgroup>
-					<optgroup label="-">
-					  <?php foreach($page_conf['jump'] as $p=>$limit ): ?>
-				      <option value="<?php echo $limit; ?>"  <?php echo $p==$page_conf['now'] ? 'selected':''; ?> ><?php echo 'P.'.$p; ?></option>
-				      <?php endforeach; ?>
-                    </optgroup>					  
-				  </select>
-				</span>
-			  </div>
+				  <div class='record_content' >
+					  <div class='record_arrange'>
+					  <?php foreach($data_pterm as $tfild => $terms): ?>
+						<?php if(count($terms)): ?>
+						<h1>
+						  <span><?php echo isset($post_query_fields[$tfild]) ? $post_query_fields[$tfild] : '欄位統計'; ?> </span>
+						  <i>：<?php echo count($terms); ?> 項</i>
+						</h1>
+						<ul class='term_filter'>
+						<?php foreach($terms as $t): ?>  
+						  <li class='term_info ' >
+							<input type='checkbox' 
+								   class='pqterm'  
+								   name='<?php echo $tfild?>' 
+								   value='<?php echo $t['key'];?>' 
+								   <?php echo isset($data_filter['pquery'][$tfild])&&in_array($t['key'],$data_filter['pquery'][$tfild]) ?  'checked':''?>   
+							> 
+							<span><?php echo $t['key'];?></span>
+							<i><?php echo $t['doc_count'];?></i>
+						  </li>
+						<?php endforeach; ?>
+						</ul>
+						<?php endif; ?>
+					  <?php endforeach; ?>
+					  </div>
+				  
+					  <table class='record_list' id='tasks_list'>
+						<tr class='data_field'>
+						  <td title='no'	><input type='checkbox' class='act_select_all'  >no.</td>
+						  <td title='縮圖'	>縮圖</td>
+						  <td title=''		>典藏號</td>
+						  <td title=''		>名稱</td>
+						  <td title=''		>存放位置</td>
+						  <td title=''		>圖檔</td>
+						  <td title=''		>入庫時間</td>
+						  <td title=''		align=center ><button type='button' class='active' id='act_volume_create' ><i class="fa fa-plus" aria-hidden="true"></i></option></td>
+						</tr>
+						<tbody class='data_result' mode='list' >   <!-- list / search--> 
+						<?php foreach($data_list as $i=>$data): ?>  
+						  
+						  <?php if($data['_source']['data_type']=='collection'): ?>
+						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+							<?php //處理搜尋標示 
+							$data_display = $data['_source'];
+							$pattern = array();
+							if(count($data_termhit)){    
+							  foreach($data_termhit as $term){
+								$pattern = '@('.preg_quote($term).')@u';  
+							  }		
+							}
+							foreach($data_display as $key => $meta){
+							  if(is_array($meta)) $meta = join('；',$meta);  
+							  $data_display[$key] = count($pattern) ? preg_replace($pattern,'<hit>\\1</hit>',$meta) : $meta;
+							}
+							?>
+							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['collection'];?>-002.jpg' /></td>
+							<td class='meta_id'><?php echo $data_display['store_id'];?></td>
+							<td class='meta_title'><?php echo $data_display['title'];?></td>
+							<td class='meta_store'><?php echo $data_display['store_location'];?> / <?php echo $data_display['store_number'];?> / <?php echo $data_display['store_boxid'];?></td>
+							<td class='meta_donum'><?php echo $data_display['count_dofiles'];?></td>
+							<td class='meta_saved'><?php echo $data_display['store_date'];?></td>
+							<td class='meta_option'>
+							  <button type='button' class='active act_meta_getin' flag-editable='<?php echo $meta_edit_flag;?>'>
+								<span class='act_editable'  ><i class="fa fa-pencil" aria-hidden="true"></i> 編輯</span> 
+								<span class='act_viewable'  ><i class="fa fa-eye" aria-hidden="true"></i> 檢視</span>
+							  </button>
+							</td>			   
+						  </tr> 
+						  
+						  
+						  <?php else: //影像 ?>
+						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+							<?php //處理搜尋標示 
+							$data_display = $data['_source'];
+							$pattern = array();
+							if(count($data_termhit)){    
+							  foreach($data_termhit as $term){
+								$pattern = '@('.preg_quote($term).')@u';  
+							  }		
+							}
+							foreach($data_display as $key => $meta){
+							  if(is_array($meta)) $meta = join('；',$meta);  
+							  $data_display[$key] = count($pattern) ? preg_replace($pattern,'<hit>\\1</hit>',$meta) : $meta;
+							}
+							?>
+							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['identifier'];?>.jpg' /></td>
+							<td class='meta_id'><?php echo $data['_source']['store_id'];?></td>
+							<td class='meta_title'><?php echo $data['_source']['title'];?></td>
+							<td class='meta_store'><?php echo $data['_dbsource']['collection']['store_location'];?> / <?php echo $data['_dbsource']['collection']['store_number'];?> / <?php echo $data['_dbsource']['collection']['store_boxid'];?></td>
+							<td class='meta_donum'> 1 </td>
+							<td class='meta_saved'><?php echo $data['_dbsource']['collection']['store_date'];?></td>
+							<td class='meta_option'>
+							  <button type='button' class='active act_meta_getin' flag-editable='<?php echo $meta_edit_flag;?>'>
+								<span class='act_editable'  ><i class="fa fa-pencil" aria-hidden="true"></i> 編輯</span> 
+								<span class='act_viewable'  ><i class="fa fa-eye" aria-hidden="true"></i> 檢視</span>
+							  </button>
+							</td>			   
+						  </tr> 
+						  <?php endif; ?>
+											
+						<?php endforeach; ?>
+						</tbody>
+					  </table>
+				  
+				  </div>
+				  <div class='record_control'>
+					<span class='record_result'>  
+					  顯示 <span> <?php echo $data_pageing; ?> </span> /
+					  共 <span> <?php echo $data_count; ?></span>  筆
+					</span>
+					<span class='record_pages'>
+					  <a class='page_tap page_to' page='<?php echo $page_conf['prev'];?>' > &#171; </a>
+					  <span class='page_select'>
+					  <?php foreach($page_conf['list'] as $p=>$limit ): ?>
+					  <a class="page_tap <?php echo $p==$page_conf['now'] ? 'page_now':'page_to'; ?>" page="<?php echo $limit;?>" ><?php echo $p; ?></a>
+					  <?php endforeach; ?>
+					  </span>
+					  <a class='page_tap page_to' page='<?php echo $page_conf['next'];?>' > &#187; </a>
+					  ，跳至
+					  <select class='page_jump'>
+						<optgroup label="首尾頁">
+						  <option value='<?php echo $page_conf['top'];?>' >首頁</option>
+						  <option value='<?php echo $page_conf['end'];?>' >尾頁</option>
+						</optgroup>
+						<optgroup label="-">
+						  <?php foreach($page_conf['jump'] as $p=>$limit ): ?>
+						  <option value="<?php echo $limit; ?>"  <?php echo $p==$page_conf['now'] ? 'selected':''; ?> ><?php echo 'P.'.$p; ?></option>
+						  <?php endforeach; ?>
+						</optgroup>					  
+					  </select>
+					</span>
+				  </div>
+				  
+				</div><!-- end of main record set-->  
+                <!-- work folder -->
+				<?php if(count($user_folders)): ?>
+				<?php   foreach($user_folders as $fid=>$folder): ?>
+				<?php    $data_start = 0; ?>
+				<div class='record_folder' id='<?php echo $fid; ?>' >  
+				  <textarea class='folder_remark' placeholder='工作備註'><?php echo $folder['remark'];?></textarea>
+				  
+				  <table class='record_list in_folder' >
+						<tr class='data_field'>
+						  <td title='no'	><input type='checkbox' class='act_select_all'  >no.</td>
+						  <td title='縮圖'	>縮圖</td>
+						  <td title=''		>典藏號</td>
+						  <td title=''		>名稱</td>
+						  <td title=''		>存放位置</td>
+						  <td title=''		>圖檔</td>
+						  <td title=''		>入庫時間</td>
+						  <td title=''		align=center > </td>
+						</tr>
+						<tbody class='data_result' mode='list' >   <!-- list / search--> 
+						<?php foreach($folder['result'] as $i=>$data): ?>  
+						  
+						  <?php if($data['_source']['data_type']=='collection'): ?>
+						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+							<?php //處理搜尋標示 
+							$data_display = $data['_source'];
+							$pattern = array();
+							if(count($data_termhit)){    
+							  foreach($data_termhit as $term){
+								$pattern = '@('.preg_quote($term).')@u';  
+							  }		
+							}
+							foreach($data_display as $key => $meta){
+							  if(is_array($meta)) $meta = join('；',$meta);  
+							  $data_display[$key] = count($pattern) ? preg_replace($pattern,'<hit>\\1</hit>',$meta) : $meta;
+							}
+							?>
+							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['collection'];?>-002.jpg' /></td>
+							<td class='meta_id'><?php echo $data_display['store_id'];?></td>
+							<td class='meta_title'><?php echo $data_display['title'];?></td>
+							<td class='meta_store'><?php echo $data_display['store_location'];?> / <?php echo $data_display['store_number'];?> / <?php echo $data_display['store_boxid'];?></td>
+							<td class='meta_donum'><?php echo $data_display['count_dofiles'];?></td>
+							<td class='meta_saved'><?php echo $data_display['store_date'];?></td>
+							<td class='meta_option'>
+							  <button type='button' class='cancel act_folder_out' title='移出資料夾' >
+								<i class="fa fa-ban" aria-hidden="true"></i>
+							  </button>
+							  <button type='button' class='active act_meta_getin' flag-editable='<?php echo $meta_edit_flag;?>'>
+								<span class='act_editable'  ><i class="fa fa-pencil" aria-hidden="true"></i> 編輯</span> 
+								<span class='act_viewable'  ><i class="fa fa-eye" aria-hidden="true"></i> 檢視</span>
+							  </button>
+							</td>			   
+						  </tr> 
+						  
+						  
+						  <?php else: //影像 ?>
+						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+							<?php //處理搜尋標示 
+							$data_display = $data['_source'];
+							$pattern = array();
+							if(count($data_termhit)){    
+							  foreach($data_termhit as $term){
+								$pattern = '@('.preg_quote($term).')@u';  
+							  }		
+							}
+							foreach($data_display as $key => $meta){
+							  if(is_array($meta)) $meta = join('；',$meta);  
+							  $data_display[$key] = count($pattern) ? preg_replace($pattern,'<hit>\\1</hit>',$meta) : $meta;
+							}
+							?>
+							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['identifier'];?>.jpg' /></td>
+							<td class='meta_id'><?php echo $data['_source']['store_id'];?></td>
+							<td class='meta_title'><?php echo $data['_source']['title'];?></td>
+							<td class='meta_store'><?php echo $data['_dbsource']['collection']['store_location'];?> / <?php echo $data['_dbsource']['collection']['store_number'];?> / <?php echo $data['_dbsource']['collection']['store_boxid'];?></td>
+							<td class='meta_donum'> 1 </td>
+							<td class='meta_saved'><?php echo $data['_dbsource']['collection']['store_date'];?></td>
+							<td class='meta_option'>
+							  <button type='button' class='active act_meta_getin' flag-editable='<?php echo $meta_edit_flag;?>'>
+								<span class='act_editable'  ><i class="fa fa-pencil" aria-hidden="true"></i> 編輯</span> 
+								<span class='act_viewable'  ><i class="fa fa-eye" aria-hidden="true"></i> 檢視</span>
+							  </button>
+							</td>			   
+						  </tr> 
+						  <?php endif; ?>
+											
+						<?php endforeach; ?>
+						</tbody>
+					  </table>
+				  
+				</div>
+				<?php   endforeach; ?>
+				<?php endif; ?>
+				<!-- end of work folder -->				
+
+				
 		    </div>
 		  </div>
 		  
