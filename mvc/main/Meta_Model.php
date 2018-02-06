@@ -1793,7 +1793,7 @@
 		    $dobj_list = $file_list;	
             
 			// 建立數位物件設定檔
-			$do_conf = array('store'=>$digital_object_path  , 'saved'=>date('Y-m-d H:i:s') , 'items'=>[] );
+			$do_conf = array('store'=>$digital_object_path  , 'saved'=>date('Y-m-d H:i:s') , 'items'=>[] ,'dotype'=>['文物卡','整理照','出版照','相片','底片','翻拍','其他']);
 			foreach($dobj_list as $i=>$do){
 			  if(!file_exists($digital_object_path.$do)) continue;
 			  
@@ -1889,11 +1889,14 @@
 		  $result['data']['dobj_config']['root']   = $meta_dobj['dopath'];
 		  $result['data']['dobj_config']['files']  = $dobj_config;
 		  $result['data']['dobj_config']['folders']= $dobj_resave;
+		  $result['data']['dobj_config']['dotypes']= $do_conf['dotype'];
+		  
 		}else{
 		  // 尚未建構數位檔案
 		  $result['data']['dobj_config']['root']   = $meta['zong'].'/';
 		  $result['data']['dobj_config']['files']  = [];	
 		  $result['data']['dobj_config']['folders']= [];
+		  $result['data']['dobj_config']['dotypes']= ['文物卡','整理照','出版照','相片','底片','翻拍','其他'];
 		}
 		
 		$result['data']['dobj_config']['folder'] = $meta['collection'];

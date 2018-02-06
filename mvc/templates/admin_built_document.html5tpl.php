@@ -965,7 +965,7 @@
 				    <span class='option md_anchor' ><i class="fa fa-thumb-tack" aria-hidden="true"></i><i class="fa fa-arrows-alt" aria-hidden="true"></i></span>
 					<button class='dofunc ' id='act_dolist_admin' title='開啟列表'>  <i class="fa fa-list" aria-hidden="true"></i>/<i class="fa fa-upload" aria-hidden="true"></i>  </button>
 					|
-					<button class='dofunc ' id='act_set_item_cover' title='設為封面'>  <i class="fa fa-picture-o" aria-hidden="true"></i> </button>
+					<button class='dofunc ' id='act_set_item_cover' title='設為封面'>  <i class="fa fa-bookmark" aria-hidden="true"></i> </button>
 				  </span>
 				  <span class='dotarget_function'>
 				    <select class='folder_selecter'  id='dobj_folder_select'  >
@@ -984,8 +984,7 @@
 					  </optgroup>
 					  <?php endforeach;?>
 				    </select>
-					<a class='option page_now_func' title='下載當前圖檔' > </a>
-					<a class='option page_now_func' title='重新載入圖檔'> </a>
+					 
 				  </span>
 				  <span class='doswitch_function'>
 				    <button class='dofunc ' id='act_download_stored' title='下載原始圖檔'>  <i class="fa fa-download" aria-hidden="true"></i>  </button>
@@ -1153,11 +1152,10 @@
 					  <div class='upload_action'>
 						
 						<span>來源：</span>
-						<?php if(isset( $fields_config['element']['dotype']) && isset($fields_config['element']['dotype']['pattern'])): ?>
-						  <?php $value_sets = explode(';',$fields_config['element']['dotype']['pattern']);?>
+						<?php if(isset( $dobj_conf['dotypes']) && count($dobj_conf['dotypes'])): ?>
 						  <select id='upload_do_type'>
-						  <?php foreach($value_sets as $item): ?> 
-						    <option value='<?php echo $item?>'><?php echo $item; ?></option>
+						  <?php foreach($dobj_conf['dotypes'] as $dtype): ?> 
+						    <option value='<?php echo $dtype?>'><?php echo $dtype; ?></option>
 						  <?php endforeach; ?>
 						  </select>
 						  <input type='text' id='upload_do_type_add' value='' size='50' style='display:none;'/>

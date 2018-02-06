@@ -111,7 +111,7 @@
 		  if(file_exists($folder_conf)){
 		    $this->FolderConf = json_decode(file_get_contents($folder_conf),true);
 		  }else{
-			$this->FolderConf = array('store'=>$UplRecord['saveto'].'browse/'.$UplRecord['folder'].'/',"saved"=>date('Y-m-d H:i:s'),"items"=>[]);  
+			$this->FolderConf = array('store'=>$UplRecord['saveto'].'browse/'.$UplRecord['folder'].'/',"saved"=>date('Y-m-d H:i:s'),"items"=>[],"dotype"=['文物卡','整理照','出版照','相片','底片','翻拍','其他']);  
 		  }
 		}
 		

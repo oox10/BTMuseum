@@ -109,9 +109,8 @@
 		if(file_exists($store_location.'/profile/'.$bookmeta['store_no'].'.conf')){
 		  $store_profile = json_decode(file_get_contents($store_location.'/profile/'.$bookmeta['store_no'].'.conf'),true);	
 		}else{
-		  $store_profile = array('store'=>$store_location.'/browse/'.$bookmeta['store_no'].'/',"saved"=>date('Y-m-d H:i:s'),"items"=>[]);  
+		  $store_profile = array('store'=>$store_location.'/browse/'.$bookmeta['store_no'].'/',"saved"=>date('Y-m-d H:i:s'),"items"=>[]."dotype"=['文物卡','整理照','出版照','相片','底片','翻拍','其他']);  
 		}
-		
 		
 		
 		echo "\n".$bookmeta['store_no'].':PASER START..'; 
