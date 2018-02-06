@@ -345,10 +345,10 @@
 						<tbody class='data_result' mode='list' >   <!-- list / search--> 
 						<?php foreach($data_list as $i=>$data): ?>  
 						  
-						  <?php if($data['_source']['data_type']=='collection'): ?>
-						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+						  <?php if($data['_search']['data_type']=='collection'): ?>
+						  <tr class='data_record' collection='<?php echo $data['_search']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
 							<?php //處理搜尋標示 
-							$data_display = $data['_source'];
+							$data_display = $data['_search'];
 							$pattern = array();
 							if(count($data_termhit)){    
 							  foreach($data_termhit as $term){
@@ -361,7 +361,7 @@
 							}
 							?>
 							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
-							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['collection'];?>-002.jpg' /></td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_search']['zong'];?>/browse/<?php echo $data['_search']['collection'];?>/<?php echo $data['@thumb'];?>' /></td>
 							<td class='meta_id'><?php echo $data_display['store_id'];?></td>
 							<td class='meta_title'><?php echo $data_display['title'];?></td>
 							<td class='meta_store'><?php echo $data_display['store_location'];?> / <?php echo $data_display['store_number'];?> / <?php echo $data_display['store_boxid'];?></td>
@@ -377,9 +377,9 @@
 						  
 						  
 						  <?php else: //影像 ?>
-						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+						  <tr class='data_record' collection='<?php echo $data['_search']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
 							<?php //處理搜尋標示 
-							$data_display = $data['_source'];
+							$data_display = $data['_search'];
 							$pattern = array();
 							if(count($data_termhit)){    
 							  foreach($data_termhit as $term){
@@ -392,9 +392,9 @@
 							}
 							?>
 							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
-							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['identifier'];?>.jpg' /></td>
-							<td class='meta_id'><?php echo $data['_source']['store_id'];?></td>
-							<td class='meta_title'><?php echo $data['_source']['title'];?></td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_search']['zong'];?>/browse/<?php echo $data['_search']['collection'];?>/<?php echo $data['_search']['identifier'];?>.jpg' /></td>
+							<td class='meta_id'><?php echo $data['_search']['store_id'];?></td>
+							<td class='meta_title'><?php echo $data['_search']['title'];?></td>
 							<td class='meta_store'><?php echo $data['_dbsource']['collection']['store_location'];?> / <?php echo $data['_dbsource']['collection']['store_number'];?> / <?php echo $data['_dbsource']['collection']['store_boxid'];?></td>
 							<td class='meta_donum'> 1 </td>
 							<td class='meta_saved'><?php echo $data['_dbsource']['collection']['store_date'];?></td>
@@ -462,10 +462,10 @@
 						<tbody class='data_result' mode='list' >   <!-- list / search--> 
 						<?php foreach($folder['result'] as $i=>$data): ?>  
 						  
-						  <?php if($data['_source']['data_type']=='collection'): ?>
-						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+						  <?php if($data['_search']['data_type']=='collection'): ?>
+						  <tr class='data_record' collection='<?php echo $data['_search']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
 							<?php //處理搜尋標示 
-							$data_display = $data['_source'];
+							$data_display = $data['_search'];
 							$pattern = array();
 							if(count($data_termhit)){    
 							  foreach($data_termhit as $term){
@@ -478,7 +478,7 @@
 							}
 							?>
 							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
-							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['collection'];?>-002.jpg' /></td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_search']['zong'];?>/browse/<?php echo $data['_search']['collection'];?>/<?php echo $data['@thumb'];?>' /></td>
 							<td class='meta_id'><?php echo $data_display['store_id'];?></td>
 							<td class='meta_title'><?php echo $data_display['title'];?></td>
 							<td class='meta_store'><?php echo $data_display['store_location'];?> / <?php echo $data_display['store_number'];?> / <?php echo $data_display['store_boxid'];?></td>
@@ -497,9 +497,9 @@
 						  
 						  
 						  <?php else: //影像 ?>
-						  <tr class='data_record' collection='<?php echo $data['_source']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
+						  <tr class='data_record' collection='<?php echo $data['_search']['collection']; ?>'  no='<?php echo $data['_id'];?>' status='' >
 							<?php //處理搜尋標示 
-							$data_display = $data['_source'];
+							$data_display = $data['_search'];
 							$pattern = array();
 							if(count($data_termhit)){    
 							  foreach($data_termhit as $term){
@@ -512,9 +512,9 @@
 							}
 							?>
 							<td class='meta_no'><input type='checkbox' class='act_selector' value='<?php echo $data['_id'];?>'> <?php echo $i+$data_start;?> </td>
-							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_source']['zong'];?>/browse/<?php echo $data['_source']['collection'];?>/<?php echo $data['_source']['identifier'];?>.jpg' /></td>
-							<td class='meta_id'><?php echo $data['_source']['store_id'];?></td>
-							<td class='meta_title'><?php echo $data['_source']['title'];?></td>
+							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_search']['zong'];?>/browse/<?php echo $data['_search']['collection'];?>/<?php echo $data['_search']['identifier'];?>.jpg' /></td>
+							<td class='meta_id'><?php echo $data['_search']['store_id'];?></td>
+							<td class='meta_title'><?php echo $data['_search']['title'];?></td>
 							<td class='meta_store'><?php echo $data['_dbsource']['collection']['store_location'];?> / <?php echo $data['_dbsource']['collection']['store_number'];?> / <?php echo $data['_dbsource']['collection']['store_boxid'];?></td>
 							<td class='meta_donum'> 1 </td>
 							<td class='meta_saved'><?php echo $data['_dbsource']['collection']['store_date'];?></td>

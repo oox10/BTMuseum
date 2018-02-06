@@ -146,12 +146,12 @@
 	
 	
 	//-- Admin Built : update task element data
-	public static function UPDATE_METADATA_DATA( $MmodifyFields = array(1) ){
+	public static function UPDATE_METADATA_DATA( $MmodifyFields=array(1) , $IdField='system_id' ){
 	  $condition = array();
 	  foreach($MmodifyFields as $field){
 	    $condition[] = $field.'=:'.$field;
 	  }
-	  $SQL_String = "UPDATE metadata SET ".join(',',$condition)." WHERE system_id=:sid AND _keep=1;";
+	  $SQL_String = "UPDATE metadata SET ".join(',',$condition)." WHERE ".$IdField."=:sid AND _keep=1;";
 	  return $SQL_String;
 	}
 	

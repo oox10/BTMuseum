@@ -286,15 +286,20 @@
 		// 取得db資料
 		$data = NULL;
 		$DB_GET	= $this->DBLink->prepare( SQL_AdMeta::GET_SEARCH_META());
-		foreach($result_source as $key => $source){
-		  if( !$DB_GET->execute(array('system_id'=> $source['_id']))){
+		foreach($result_source as $key => $search){
+		  if( !$DB_GET->execute(array('system_id'=> $search['_id']))){
 		    continue;
 		  }  
 		  
 		  $meta = $DB_GET->fetch(PDO::FETCH_ASSOC);
+		  $source = json_decode($meta['source_json'],true);
+		  
+		  $result_source[$key]['_search'] = json_decode($meta['search_json'],true); 
+		  $result_source[$key]['@thumb']  = $source['collection']['cover_page'] ? $source['collection']['cover_page'] :  $source['collection']['store_no'].'-002.jpg' ; 
 		  $result_source[$key]['_dbsource'] = json_decode($meta['source_json'],true);
 		  
-		  $work_folder[] = $source['_id'];
+		  
+		  $work_folder[] = $search['_id'];
 		
 		}
 		
@@ -385,9 +390,10 @@
 		  }
 		  while($meta = $DB_GET->fetch(PDO::FETCH_ASSOC)){
             $key    = $meta['system_id'];
-			$source = json_decode($meta['source_json'],true);	
+			$source = json_decode($meta['source_json'],true);
             $result_source[$key]['_id'] = $key;			
-			$result_source[$key]['_source'] = json_decode($meta['search_json'],true); 
+			$result_source[$key]['_search'] = json_decode($meta['search_json'],true); 
+			$result_source[$key]['@thumb']  = $source['collection']['cover_page'] ? $source['collection']['cover_page'] :  $source['collection']['store_no'].'-002.jpg' ; 
 			$result_source[$key]['_db']['@time'] = $meta['@time'];
 			$result_source[$key]['_db']['@user'] = $meta['@user'];
 			$result_source[$key]['_db']['count_element'] = $source['collection']['count_element'];
@@ -3994,18 +4000,15 @@
 		}
 		$DB_SAVE->execute();
 		
-		// 執行logs
-		$DB_LOGS	= $this->DBLink->prepare(SQL_AdMeta::LOGS_META_MODIFY());
-		$DB_LOGS->bindValue(':zong' 	   , $DataType);
-		$DB_LOGS->bindValue(':identifier'  , $DataFolder);
-		$DB_LOGS->bindValue(':sysid' 	   , 0);
-		$DB_LOGS->bindValue(':method'      , 'UPDATE');
-		$DB_LOGS->bindValue(':source'      , '[]');
-		$DB_LOGS->bindValue(':update'      , json_encode($source_update));
-		$DB_LOGS->bindValue(':user' 	   , $this->USER->UserID);
-		$DB_LOGS->bindValue(':result'      , 1);
-		$DB_LOGS->execute();
-        
+		// 執行更新 meta
+		$DB_SAVE= $this->DBLink->prepare(SQL_AdMeta::UPDATE_METADATA_DATA(array('_index'), 'collection'));
+		$DB_SAVE->bindValue(':sid'    , $DataFolder);
+		$DB_SAVE->bindValue(':_index' , 0);
+		$DB_SAVE->execute();
+		
+		$active = self::ADMeta_Process_Meta_Update();
+		
+		
 		// final 
 		$result['data']   = $DoFileName;
 		$result['action'] = true;

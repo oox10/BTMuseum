@@ -400,7 +400,7 @@
 	  self::data_output('file','',$this->Model->ModelResult); 
 	}
 	
-	// File: 下載數位原始檔案
+	// File: 設定封面
 	public function dosetcover($DataType,$Folder,$DoFileName){  
 	  $action = $this->Model->ADMeta_Dobj_Set_Cover($DataType,$Folder,$DoFileName);
 	  self::data_output('json','',$this->Model->ModelResult); 
