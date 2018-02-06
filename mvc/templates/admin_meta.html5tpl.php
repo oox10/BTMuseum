@@ -352,7 +352,7 @@
 							$pattern = array();
 							if(count($data_termhit)){    
 							  foreach($data_termhit as $term){
-								$pattern = '@('.preg_quote($term).')@u';  
+								$pattern[] = '@('.preg_quote($term).')@u';  
 							  }		
 							}
 							foreach($data_display as $key => $meta){
@@ -469,7 +469,7 @@
 							$pattern = array();
 							if(count($data_termhit)){    
 							  foreach($data_termhit as $term){
-								$pattern = '@('.preg_quote($term).')@u';  
+								$pattern[] = '@('.preg_quote($term).')@u';  
 							  }		
 							}
 							foreach($data_display as $key => $meta){
