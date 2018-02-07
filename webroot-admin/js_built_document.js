@@ -750,7 +750,22 @@
 			data_orl['volume'] = data_load.source;
 			insert_data_to_volume_form(data_load.source);
 		  }else{
-			system_message_alert('',response.info);
+			
+			if(response.data.save){
+			  $.each(response.data.save,function(mf,err){
+				if($('#'+mf).length){
+				  $('#'+mf).focus();	
+				}else if($("_update[name='"+mf+"']").length){
+				  $('#'+mf).focus();				  
+				}
+				system_message_alert('',err);
+			    return false;
+			  })	
+			}else{
+			  system_message_alert('',response.info);	
+			}
+			
+			
 	      }
 	    },
 		complete:	function(){  }

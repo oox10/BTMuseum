@@ -2222,6 +2222,8 @@
 		$source_update = [];
 		$source_origin = [];
 		
+		$modify_detect = [];
+		
 		foreach($data_modify as $edit_filed=>$edit_value){
 		  $db_field = str_replace('META-V-','',$edit_filed);  
 		  $update_value = is_array($edit_value) ? join(',',$edit_value) : $edit_value;
@@ -2229,6 +2231,12 @@
 		  if(!isset($volume[$db_field]) ) continue;  
 		  if( $volume[$db_field] == $update_value) continue;
 	      
+		  if($set_field_checker[$db_field]['module'] == 'R' && !preg_match( $set_field_checker[$db_field]['pattern'],$update_value) ){
+			$modify_detect[$edit_filed] = $set_field_checker[$db_field]['descrip'].'格式錯誤';  
+		  }else if($set_field_checker[$db_field]['module'] == 'V' && !$set_field_checker[$db_field]['pattern']!=$update_value){
+			$modify_detect[$edit_filed] = $set_field_checker[$db_field]['descrip'].'內容錯誤'; 
+		  }
+		  
 		  $source_update[$db_field] = $update_value;	
 		  $source_origin[$db_field] = $volume[$db_field];
 		  
@@ -2265,6 +2273,12 @@
 		  }
 		
 		}
+		
+		if(count($modify_detect)){
+		  $result['data'] = $modify_detect;	
+		  throw new Exception('_SYSTEM_ERROR_FILE_CHECK_FAIL');	 
+		}
+		
 		
 			
 		$store_id_set  = [];  // 典藏號聚合集
