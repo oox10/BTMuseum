@@ -1,8 +1,5 @@
 TODO:
 單件新增
-批次匯入
-修改影像類型
-
 
 [builter]
 display ?
