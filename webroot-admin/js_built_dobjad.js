@@ -685,7 +685,8 @@
 	
 	//@-- 設定為資料封面
 	$('#act_set_item_cover').click(function(){
-      var do_name = $('.page_selecter').val()	  
+      
+	  var do_name = $('.page_selecter').val()	  
       if(!do_name){
 		system_message_alert('','尚未選擇影像');  
 	    return false;
@@ -694,9 +695,6 @@
 	  // get reference
 	  var dataroot = $('meta#DATAROOT').data('set');  // 資料分類
 	  var dofolder = $('meta#DOFOLDER').data('set');  // 檔案資料夾
-	  
-	  var recrod = $(this).parents('tr.file');
-	  
 	 
 	  $.ajax({
 		  url: 'index.php',
@@ -817,7 +815,7 @@
 	
 	
 	//@-- jquery scroll bar thumb 區塊卷軸
-    if($('#thumb_block_weaper').length){
+    if($('#dobj_thumb_block').length){
 		
 		// 切換重新設定 scroll	
 		var setting = {
@@ -825,7 +823,7 @@
 		  showArrows: false
 		};
 		// 設定 jScrollPane
-		$('#thumb_block_weaper ').scrollbar();	 
+		$('#dobj_thumb_block ').scrollbar(setting);	 
     }
 	
 	
@@ -1807,7 +1805,7 @@
 				selecter.html("P."+(i+1)+" / "+dobj.file);
 				selecter.appendTo($('#dobj_select_dom'));
                 
-                var thumb = $('<div/>').addClass('thumb').attr('p',dobj.file);
+                var thumb = $('<div/>').addClass('thumb').attr('p',dobj.file).attr('data-folder',dobj.dotype);
 				thumb.append("<img data-src='thumb.php?src="+dataroot+"thumb/"+dofolder+"/"+dobj.file+"' />");
 				thumb.append("<i>P."+(i+1)+"</i>");
 				thumb.appendTo($('#dobj_thumb_block'));
@@ -1816,6 +1814,7 @@
 				var record = $('<tr/>').addClass('file').attr({'data-file':dobj.file,'data-order':i});
 				record.append(" <td class='fsel' ><input type='checkbox' class='act_selone_dfile' name='fselect' value='"+dobj.file+"'></td>");
 				record.append(" <td class='fnum' >"+(i+1)+"</td>");
+				record.append(" <td class='ftype' >"+dobj.dotype+"</td>");
 				record.append(" <td class='fname' >"+dobj.file+"</td>");
 				record.append(" <td class='finfo' >"+dobj.width+'x'+dobj.height+"</td>");
 				record.append(" <td class='fedit' ><span class='option inlinefunc' edit='-1' ><i class='fa fa-pencil' aria-hidden='true' title='修改檔名'></i><i class='fa fa-save' aria-hidden='true'></i><i class='fa fa-external-link act_adfile_downloaddo' aria-hidden='true' title='下載檔案'></i></span></td>");

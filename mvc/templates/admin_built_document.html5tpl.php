@@ -846,7 +846,7 @@
 					  <div class='data_col' id='' > 
 					    <label class='data_field '>所屬族群</label>
 					    <div class='data_value '> 
-                          <input type='text' class='_volume _variable ' name="META-V-ethnic" value='<?php echo $meta_collect['META-V-ethnic'];?>' readonly disabled /> 
+                          <input type='text' class='_volume ' name="META-V-ethnic" value='<?php echo $meta_collect['META-V-ethnic'];?>' readonly disabled /> 
 						</div>
 					  </div>
 					  <div class='field_set'> 	  
@@ -1205,7 +1205,7 @@
 		  
 		  <!-- 影像縮圖 -->
 		  <div class='module_container _unselect' id='thumb_module' mode='asthumb' move='0'  data-root='<?php echo $dobj_conf['root'];?>' data-folder='<?php echo $dobj_conf['folder'];?>' data-upload='' >  
-			<div class='block_wrapper'>
+			<div class='block_wrapper'  >
 		      
 			  <div id='dobj_thumb_cover' >
 			    <div id='cover_container'>
@@ -1216,7 +1216,7 @@
 				</span>
 			  </div>
 			  <div id='dobj_thumb_block' >
-		        <div id='thumb_block_weaper'>
+		         
 				  <?php if(isset($dobj_conf['files'])): ?>
 					<?php $i=1; ?>
 					<?php foreach($dobj_conf['files'] as $i => $file_conf):?>
@@ -1226,7 +1226,7 @@
 					</div>
 					 <?php endforeach;?>
 				  <?php endif; ?>	
-				</div>
+				 
 		      </div>
 			</div>
 		  </div>

@@ -172,7 +172,7 @@
 	
 	//-- Admin Built : create new volume
 	public static function INSERT_VOLUME_DATA( ){
-	  $SQL_String = "INSERT INTO source_digiarchive VALUES(null, :class, :zong, :fonds, '', '', '', '', '', '', '', '新增文物', '', '', '', '', '', '', '', '', '', '0000-00-00', '', '', '', 0, '', '', '',0 , 0, '新增' ,0 ,0 ,1 ,'北投文物館' ,'".date('Y-m-d H:i:s')."', :user, NULL, '', 1)";
+	  $SQL_String = "INSERT INTO source_digiarchive VALUES(null, :class, :zong, :fonds, '', '', '', '', '', '', '','', '新增文物', '', '', '', '', '', '', '', '', '', '0000-00-00', '', '', '', '' ,0, '', '', '',0 , 0, '新增' ,0 ,0 ,1 ,'北投文物館' ,'".date('Y-m-d H:i:s')."', :user, NULL, '', 1)";
 	  return $SQL_String;
 	}
 	
