@@ -2380,8 +2380,6 @@
 		}
 		$form_meta[$form_prehead.'file_store_id'] = $volume_meta['store_id'].'-'.$source_meta['file_no'];
 		
-		
-		
 		//讀取暫存器
 		$buffer = [];
 		$editor_config_file = _SYSTEM_USER_PATH.$this->USER->UserID.'/editor.conf';
@@ -2411,12 +2409,12 @@
 	  $result_key = parent::Initial_Result('save');
 	  $result 	  = &$this->ModelResult[$result_key];
 	  
-	  $pass_meta  = is_array($MetaEncode) ? $MetaEncode : json_decode(base64_decode(str_replace('*','/',rawurldecode($MetaEncode))),true); 
+	  $data_modify= is_array($MetaEncode) ? $MetaEncode : json_decode(base64_decode(str_replace('*','/',rawurldecode($MetaEncode))),true); 
 	  
 	  try{  
 		
 		// 欄位資料
-		if(!is_array($pass_meta) || count($pass_meta) ){
+		if(!is_array($data_modify) || count($data_modify) ){
           //throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
 		}
 		
@@ -2436,6 +2434,25 @@
 		  $element_store_no =  $SourceStoreNo;
 		}
 		
+		
+		// 取得資料表欄位檢測
+		$set_field_checker = [];
+		$DB_GET= $this->DBLink->prepare(SQL_AdMeta::GET_TABLE_FORMAT());
+		$DB_GET->bindValue(':dbtable' , 'source_digielement');
+		if($DB_GET->execute()){
+		  while($field = $DB_GET->fetch(PDO::FETCH_ASSOC)){
+			$set_field_checker[$field['dbcolumn']] = $field;
+		  }
+		}
+		
+		// 取得卷資料
+		$volume = array();
+		$DB_SOURCE	= $this->DBLink->prepare( SQL_AdMeta::GET_SOURCE_FROM_METADATA('source_digiarchive','collection'));
+		$DB_SOURCE->bindParam(':id'   , $VolumeId );	
+		if( !$DB_SOURCE->execute() || !$volume = $DB_SOURCE->fetch(PDO::FETCH_ASSOC)){
+		  throw new Exception('_SYSTEM_ERROR_DB_RESULT_NULL');
+		}
+		
 		// 取得source element
 		$element_meta = [];
 		$DB_GET	= $this->DBLink->prepare(SQL_AdMeta::GET_SOURCE_FROM_METADATA('source_digielement','identifier'));
@@ -2450,13 +2467,51 @@
 		
 		// 檢查更新欄位是否合法
 		$source_update = [];
-		foreach($pass_meta as $edit_filed=>$edit_value){
-		  $db_field = preg_replace('/^META-(R|E)-/','',$edit_filed);
-		  if(!isset($element_meta[$db_field]) || $element_meta[$db_field]==$edit_value ){
-			continue;  
+		$source_origin = [];
+		
+		foreach($data_modify as $edit_filed=>$edit_value){
+		  $db_field = preg_replace('/^META-(R|E)-/','',$edit_filed); 
+		  $update_value = is_array($edit_value) ? join(',',$edit_value) : $edit_value;
+		  
+		  if(!isset($element_meta[$db_field]) ) continue;  
+		  if( $element_meta[$db_field] == $update_value) continue;
+	      
+		  $source_update[$db_field] = $update_value;	
+		  $source_origin[$db_field] = $element_meta[$db_field];
+		  
+		  //新增選項條件
+	      if(isset($set_field_checker[$db_field]) &&  ($set_field_checker[$db_field]['module']=='S' || $set_field_checker[$db_field]['module']=='E') ){
+			
+			$field_value_module= $set_field_checker[$db_field]['module']=='S' ? 'set' : 'enum';
+			$field_value_check = explode(';',$set_field_checker[$db_field]['pattern']);
+			$field_value_setad = $field_value_check;
+			
+			if(is_array($edit_value)){
+			  foreach($edit_value as $ev){
+                if(in_array($ev,$field_value_check)) continue;			  
+			    $field_value_setad[] = $ev;
+			  }
+			}else{
+			  if(!in_array($edit_value,$field_value_check)){
+			    $field_value_setad[] = $edit_value; 
+			  }	
+			}
+			
+			// 更新source資料表
+			if(count($field_value_setad) != count($field_value_check)){
+			  $DB_UPDB = $this->DBLink->prepare( SQL_AdMeta::UPDATE_TABLE_FORMAT());	
+			  $DB_UPDB->bindValue(':pattern',join(';',$field_value_setad));
+			  $DB_UPDB->bindValue(':dbtable','source_digielement');
+			  $DB_UPDB->bindValue(':dbcolumn',$db_field);
+			  $DB_UPDB->execute();
+			  
+			  $DB_UPDB = $this->DBLink->prepare( SQL_AdMeta::SET_DBTABLE_SETFIELD('source_digielement',$db_field,$field_value_module,$field_value_setad));	
+			  $DB_UPDB->execute();
+			}
 		  }
-		  $source_update[$db_field] = $edit_value;	
+		
 		}
+		
 		
 		if(count($source_update)){
 			
@@ -2487,7 +2542,7 @@
 		  $DB_LOGS->bindValue(':identifier', $element_store_no);
 		  $DB_LOGS->bindValue(':sysid' 	   , $system_id);
 		  $DB_LOGS->bindValue(':method'    , 'UPDATE');
-		  $DB_LOGS->bindValue(':source'    , '[]');
+		  $DB_LOGS->bindValue(':source'    , json_encode($source_origin));
 		  $DB_LOGS->bindValue(':update'    , json_encode($source_update));
 		  $DB_LOGS->bindValue(':user' 	   , $this->USER->UserID);
 		  $DB_LOGS->bindValue(':result'    , 1);
@@ -2506,6 +2561,9 @@
 		// final 
 		$result['data']['system_id'] = $system_id;
 		$result['data']['source_id'] = $element_store_no;
+		$result['data']['updated']   = $source_update;
+		
+		
 		$result['action'] = true;
     	
 	  } catch (Exception $e) {
@@ -2542,20 +2600,25 @@
 		}
 		
 		
-		// 計算新件號
-		$elements    = [];
-		$max_file_no = 0;
-		$DB_GET	= $this->DBLink->prepare( SQL_AdMeta::GET_COLLECTION_ELEMENTS($db_element_table));
-		$DB_GET->bindParam(':collection' , $meta['collection']);	
-		if( !$DB_GET->execute() ){
-		  throw new Exception('_SYSTEM_ERROR_DB_RESULT_NULL');
-		}
-		while($tmp = $DB_GET->fetch(PDO::FETCH_ASSOC)){
-		  $max_file_no = $max_file_no < $tmp['file_no'] ? $tmp['file_no'] :  $max_file_no;
+		if(isset($meta_newa['file_no'])){  	
+	      $temp_identifier = $VolumeId.'-'.str_pad(intval($meta_newa['file_no']),3,'0',STR_PAD_LEFT);	
+		}else{
+		  // 計算新件號
+		  $elements    = [];
+		  $max_file_no = 0;
+		  $DB_GET	= $this->DBLink->prepare( SQL_AdMeta::GET_COLLECTION_ELEMENTS($db_element_table));
+		  $DB_GET->bindParam(':collection' , $meta['collection']);	
+		  if( !$DB_GET->execute() ){
+		    throw new Exception('_SYSTEM_ERROR_DB_RESULT_NULL');
+		  }
+		  while($tmp = $DB_GET->fetch(PDO::FETCH_ASSOC)){
+		    $max_file_no = $max_file_no < $tmp['file_no'] ? $tmp['file_no'] :  $max_file_no;
+		  }	
+		  $temp_identifier = $VolumeId.'-'.str_pad(($max_file_no+1),3,'0',STR_PAD_LEFT);
 		}
 		
-		$DB_NEW	= $this->DBLink->prepare(SQL_AdMeta::INSERT_ELEMENT_DATA());
 		// 新增件資料
+		$DB_NEW	= $this->DBLink->prepare(SQL_AdMeta::INSERT_ELEMENT_DATA());
 		$DB_NEW->bindParam(':collection_id'  , $VolumeId);
 		$DB_NEW->bindParam(':user' , $this->USER->UserID);
 		if( !$DB_NEW->execute() ){
@@ -2563,7 +2626,6 @@
 		}
 		
 		$new_element_no  = $this->DBLink->lastInsertId('source_digielement');
-		$temp_identifier = $VolumeId.'-'.str_pad(($max_file_no+1),3,'0',STR_PAD_LEFT);
 		
 		$source_array = ['collection'=>$collection,'element'=>[]];
 		$source_array['element'] = [
@@ -2575,8 +2637,8 @@
 		$DB_NEWMETA = $this->DBLink->prepare(SQL_AdMeta::INSERT_NEW_METADATA());	
 	    
 		// 註冊meta資料
-		$DB_NEWMETA->bindValue(':class',$collection['class']);
-		$DB_NEWMETA->bindValue(':zong', $collection['zong']);
+		$DB_NEWMETA->bindValue(':class'		,$collection['class']);
+		$DB_NEWMETA->bindValue(':zong'		, $collection['zong']);
 		$DB_NEWMETA->bindValue(':data_type','element');
 		$DB_NEWMETA->bindValue(':collection'	,$collection['store_no']);
 		$DB_NEWMETA->bindValue(':identifier'	,$temp_identifier);
@@ -2585,7 +2647,7 @@
 		$DB_NEWMETA->bindValue(':search_json'	,'[]');
 		$DB_NEWMETA->bindValue(':dobj_json'		,json_encode(array('dopath'=>$collection['zong'].'/','folder'=>$VolumeId)));
 		$DB_NEWMETA->bindValue(':refer_json'	,json_encode(array()));
-		$DB_NEWMETA->bindValue(':page_count'	,0);
+		$DB_NEWMETA->bindValue(':page_count'	,1);
 		$DB_NEWMETA->bindValue(':lockmode'		,'');
 		$DB_NEWMETA->bindValue(':auditint'		,0);
 		$DB_NEWMETA->bindValue(':checked'		,1);
@@ -2597,11 +2659,17 @@
 		}
 		$system_id = $this->DBLink->lastInsertId('metadata');
 		
-		// 執行更新
-		$DB_UPD= $this->DBLink->prepare(SQL_AdMeta::UPDATE_SOURCE_META(array('store_no'),'source_digielement','seno'));
-		$DB_UPD->bindValue(':id'        , $new_element_no);
-		$DB_UPD->bindValue(':store_no'  , $temp_identifier);
 		
+		// 執行更新
+		$element_meta = array('store_no'=>$temp_identifier);
+		if(count($meta_newa)){
+		  $element_meta = array_merge($element_meta,$meta_newa);
+		}
+		$DB_UPD= $this->DBLink->prepare(SQL_AdMeta::UPDATE_SOURCE_META(array_keys($element_meta),'source_digielement','seno'));
+		$DB_UPD->bindValue(':id'        , $new_element_no);
+		foreach($element_meta as $ef=>$ev){
+		  $DB_UPD->bindValue(':'.$ef  , $ev);	
+		}
 		if( !$DB_UPD->execute()){
 		  throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');
 		}
@@ -2613,14 +2681,14 @@
 		$DB_LOGS->bindValue(':identifier' , $temp_identifier);
 		$DB_LOGS->bindValue(':method'     , 'CREATE');
 		$DB_LOGS->bindValue(':source' 	  , '[]');
-		$DB_LOGS->bindValue(':update' 	  , '[]');
+		$DB_LOGS->bindValue(':update' 	  , json_encode($element_meta));
 		$DB_LOGS->bindValue(':user' 	  , $this->USER->UserID);
 		$DB_LOGS->bindValue(':result' , 1);
 		$DB_LOGS->execute();
 		
 		// final
-		$result['data']['source_id']   = $new_element_no;
 		$result['data']['system_id']   = $system_id;
+		$result['data']['source_id']   = $new_element_no;
 		$result['data']['store_no']    = $temp_identifier;
 		
 		$result['action'] = true;
@@ -4080,12 +4148,12 @@
 		  $dobj_profile['items'][$i]['dotype'] = $DoNewType;	
 		}
 		
-		if(!isset($dobj_profile['dotype'])){
+		if(!isset($dobj_profile['dotype']) || !count($dobj_profile['dotype'])){
 		  $dobj_profile['dotype'] = ['文物卡','整理照','出版照','相片','底片','翻拍','其他'];
 		}
 		
 		if(!in_array($DoNewType,$dobj_profile['dotype'])){
-		  $dobj_profile['dotype'] = array_unshift($dobj_profile['dotype'],$DoNewType);	
+		   array_unshift($dobj_profile['dotype'],$DoNewType);	
 		}
 		
 		file_put_contents($profile_path,json_encode($dobj_profile));

@@ -224,6 +224,13 @@
 	}
 	 
 	// AJAX: 取得資料內容
+	public function itemnewa($VolumnStoreNo,$DataJson){
+	  $this->Model->ADBuilt_Newa_Element_Data($VolumnStoreNo,$DataJson);
+	  self::data_output('json','',$this->Model->ModelResult);
+	} 
+	 
+	
+	// AJAX: 取得資料內容
 	public function itemread($VolumnStoreNo,$ElementStoreNo){
 	  $this->Model->ADBuilt_Get_Element_Data($VolumnStoreNo,$ElementStoreNo);
 	  self::data_output('json','',$this->Model->ModelResult);

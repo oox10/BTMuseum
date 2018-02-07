@@ -121,7 +121,7 @@
 	
 	//-- Admin Built : get source meta from metadata
 	public static function GET_SOURCE_FROM_METADATA($DBTableName='source_digiarchive',$LinkField='collection',$TableKey='store_no'){
-	  $SQL_String = "SELECT ".$DBTableName.".*,system_id FROM metadata LEFT JOIN ".$DBTableName." ON ".$LinkField."=store_no WHERE ".$TableKey."=:id AND _keep=1;";
+	  $SQL_String = "SELECT ".$DBTableName.".*,system_id FROM metadata LEFT JOIN ".$DBTableName." ON ".$LinkField."=store_no WHERE ".$TableKey."=:id AND _keep=1 AND _metakeep=1;";
 	  return $SQL_String;
 	}
 	
@@ -179,7 +179,7 @@
 	
 	//-- Admin Built : create new element
 	public static function INSERT_ELEMENT_DATA( ){
-	  $SQL_String = "INSERT INTO source_digielement VALUES(null, :collection_id, '', '', '', '', '', '', '', '', '', '', '', '不開放', 0, 0, 0, '北投文物館', '".date('Y-m-d H:i:s')."', :user, NULL, '', 1)";
+	  $SQL_String = "INSERT INTO source_digielement VALUES(null, :collection_id, '' , '', '', '', '', '', '', '', '', '', '不開放', 0, 0, 0, '北投文物館', '".date('Y-m-d H:i:s')."', :user, NULL, '', 1)";
 	  return $SQL_String;
 	}
 	

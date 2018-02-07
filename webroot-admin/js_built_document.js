@@ -758,6 +758,76 @@
 	});
 	
 	
+	//@-- volume create  新增卷
+	
+	function act_volume_create(){
+	  
+	  if(!check_meta_modify()) return false;  
+	  
+	  $.ajax({
+		  url: 'index.php',
+		  type:'POST',
+		  dataType:'json',
+		  data: {act:'Meta/volumenew/'},
+		  beforeSend: 	function(){ system_loading();  },
+		  error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+		  success: 		function(response) {
+			if(response.action){  
+			  location.href='index.php?act=Meta/editor/'+response.data.volume.system_id;	  
+			}else{
+			  system_message_alert('',response.info);
+			}
+		  },
+		  complete:		function(){   }
+	  }).done(function() { system_loading();   });	
+	  
+	}
+	
+	
+	//@-- volume delete 刪除卷
+	function act_volume_delete(){
+	  
+	  if(!$('#SYSTEMID').data('set')){
+		system_message_alert("資料錯誤，請重新整理頁面!!");  
+	    return false;
+	  }
+	  
+	  if(!confirm("刪除文物資料將導致建立之影像資訊與數位檔案清空!\n確定要刪除本筆文物資料嗎?"))  return false;   
+	  
+	    /* var person = prompt("Please enter your name:", "Harry Potter");
+		if (person == null || person == "") {
+			txt = "User cancelled the prompt.";
+		} else {
+			txt = "Hello " + person + "! How are you today?";
+		}
+		document.getElementById("demo").innerHTML = txt;*/
+	  
+	  
+	  $.ajax({
+		  url: 'index.php',
+		  type:'POST',
+		  dataType:'json',
+		  data: {act:'Meta/volumedele/'+$('#SYSTEMID').data('set')},
+		  beforeSend: 	function(){ system_loading();  },
+		  error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+		  success: 		function(response) {
+			if(response.action){  
+			  window.close(); 
+			}else{
+			  system_message_alert('',response.info);
+			}
+		  },
+		  complete:		function(){   }
+	  }).done(function() { system_loading();   });
+	  
+	  
+	  
+	}
+	
+	
+	
+	
+	
 	
 	/***== [ CATEGORY FUNCTION ] ==***/
 	
@@ -766,9 +836,7 @@
 	  var new_element = $('tr._record_template').clone();
 	  new_element.removeClass('_record_template').attr('no','_addnew');
 	  new_element.appendTo('.data_result');
-	  
 	  $('#record_member').css('display','flex');
-	  
 	});
 	
 	
@@ -783,7 +851,12 @@
 	});
 	
 	
+	
+	
+	
+	
 	/***== [ ELEMENT FUNCTION ] ==***/
+	
 	
 	//@-- switch item meta
 	$('.act_switch_element').click(function(){
@@ -818,16 +891,79 @@
 	
 	
 	
+	
+	//-- image active editor 
+	$('#act_active_element_edit').click(function(){
+		
+	  var do_file = $('.page_selecter').val()	  
+      if(!do_file){
+		system_message_alert('','尚未選擇影像');  
+	    return false;
+	  }	  	
+	  
+	  var myRe = /(BM\d+)\-(\d+)\.(jpg|png)/;
+      var item = myRe.exec(do_file);
+	  
+	  var volume_no  = item[1];
+	  var element_no = item[1]+'-'+item[2]; 
+	  var element_dotype = $(".thumb[p='"+do_file+"']").attr("data-folder");
+	  
+	  
+	  $(".meta_group_sel[data-group='element_list']").trigger('click');
+	  
+	  if($("._element_read[id='"+element_no+"']").length){
+		$("._element_read[id='"+element_no+"']").trigger('click');
+	  }else{	  
+		
+		var meta = {};
+		meta['file_no']  = item[2];
+		meta['dotype']   = element_dotype;
+		meta['doformat'] = item[3];
+		
+		var passer_data  = encodeURIComponent(Base64M.encode(JSON.stringify(meta)));
+	    
+		$.ajax({
+          url: 'index.php',
+	      type:'POST',
+	      dataType:'json',
+	      data: {act:'Meta/itemnewa/'+volume_no+'/'+passer_data},
+		  beforeSend: 	function(){ system_loading();  },
+          error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+	      success: 		function(response) {
+		    if(response.action){  
+			  
+			  var new_element = $('tr._record_template').clone();
+			  new_element.removeClass('_record_template').attr({'no':response.data.newa.store_no,'id':element_no});
+			  new_element.find("td[field='META-E-store_no']").html(element_no);
+			  new_element.find("td[field='META-E-dotype']").html(element_dotype);
+			  new_element.find("td[field='META-E-doname']").html("新增影像目錄");
+			  new_element.find("td[field='META-E-doformat']").html(item[3]);
+			  new_element.appendTo('.data_result').trigger('click'); 
+			  
+		    }else{
+			  system_message_alert('',response.info);
+		    }
+	      },
+		  complete:		function(){   }
+	    }).done(function() { system_loading();   });
+		
+	  }
+	   
+		
+	});
+	
+	
+	
+	
+	
+	
 	//--read item data
 	$(document).on('click','._element_read',function(){
 	 
-       
 	  // get value
 	  var data_no   = $(this).attr('no');
 	  var volumn_id = $("#VOLUMEID").data('set')
 	  var main_dom  = $(this);
-	  
-	  
 	  
 	  // active ajax
 	  if( ! data_no ){
@@ -862,7 +998,6 @@
 			  FLAG_SYSTEM_EDITOR_LEVEL = 2;
 			
 			  //開啟影像
-			  
 			  if($('#META-E-store_no').val()){
 		        $('.page_selecter').val($('#META-E-store_no').val()+'.jpg').trigger('change');   
 	          }
@@ -916,7 +1051,15 @@
 		    element_meta[field_name] = $(this).prop('checked') ? 1 : 0;  
 		  }else{
 			var field_name = $(this).attr('name');
-		    element_meta[field_name] = $("input[name='"+field_name+"']:checked").map(function(){return $(this).val(); }).get().join(';');  
+		    if(typeof element_meta[field_name] == 'undefined') element_meta[field_name] = [];
+			
+			if($(this).prop('checked')){
+		      var select_value = $(this).val()=='_newa' ? $(this).next().val() : $(this).val();
+			  if(select_value){
+				element_meta[field_name].push(select_value); 
+			  }
+			}
+		  
 		  }
 		}else{
 		  var field_name  = $(this).attr('id');
@@ -937,7 +1080,7 @@
 	  
 	  // encode data
 	  var passer_data  = encodeURIComponent(Base64M.encode(JSON.stringify(element_meta)));
-      
+       
 	  // active ajax
       $.ajax({
         url: 'index.php',
@@ -965,6 +1108,13 @@
 			insert_data_to_element_form(main_dom,data_orl['element']);
 			insert_data_to_element_form($('#record_member'),data_orl['element']);
             
+			if(typeof response.data.save.updated.dotype != 'undefined'){
+			  if(!$('#dobj_folder_change').find("option[value='"+response.data.save.updated.dotype+"']").length){
+				$('#dobj_folder_change').append("<option value='"+response.data.save.updated.dotype+"' >"+response.data.save.updated.dotype+"</option>");
+			  }
+			  $('#dobj_folder_change').val(response.data.save.updated.dotype).trigger('change');
+			}
+			
 			$('#record_member').css('display','flex'); 	
 			  			
 		  }else{
@@ -976,27 +1126,6 @@
 	  
 	  
 	});
-	
-	
-	//@-- create new element in detail mode
-	$('#act_newa_element_meta').click(function(){
-	  // check if has new
-	  if($("tr.data_record[no='_addnew']").length){
-		if(!confirm("尚有新增案件尚未儲存，確定要新增一筆資料嗎？\n可能會造成資料序號順序與後續排序的問題!!")){
-		  return false;	
-		}  
-	  }
-	  
-	  // 暫存歷史紀錄，僅適用於下一件與新增
-	  historyinput=data_orl['element'];
-	  
-	  initial_metadata_editer('_element._detail');
-	  var new_element = $('tr._record_template').clone();
-	  new_element.removeClass('_record_template').attr('no','_addnew');
-	  new_element.appendTo('.data_result').trigger('click'); 
-	  
-	});
-	
 	
 	//@-- iterm function execute
 	$('#act_element_built_function').change(function(){
@@ -1125,77 +1254,6 @@
 	  }).done(function(r) {  system_loading(); });
 	  $(this).val('');
 	}
-	
-	
-	
-	//@-- volume create  新增卷
-	
-	function act_volume_create(){
-	  
-	  if(!check_meta_modify()) return false;  
-	  
-	  $.ajax({
-		  url: 'index.php',
-		  type:'POST',
-		  dataType:'json',
-		  data: {act:'Meta/volumenew/'},
-		  beforeSend: 	function(){ system_loading();  },
-		  error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
-		  success: 		function(response) {
-			if(response.action){  
-			  location.href='index.php?act=Meta/editor/'+response.data.volume.system_id;	  
-			}else{
-			  system_message_alert('',response.info);
-			}
-		  },
-		  complete:		function(){   }
-	  }).done(function() { system_loading();   });	
-	  
-	}
-	
-	
-	//@-- volume delete 刪除卷
-	function act_volume_delete(){
-	  
-	  if(!$('#SYSTEMID').data('set')){
-		system_message_alert("資料錯誤，請重新整理頁面!!");  
-	    return false;
-	  }
-	  
-	  if(!confirm("刪除文物資料將導致建立之影像資訊與數位檔案清空!\n確定要刪除本筆文物資料嗎?"))  return false;   
-	  
-	    /* var person = prompt("Please enter your name:", "Harry Potter");
-		if (person == null || person == "") {
-			txt = "User cancelled the prompt.";
-		} else {
-			txt = "Hello " + person + "! How are you today?";
-		}
-		document.getElementById("demo").innerHTML = txt;*/
-	  
-	  
-	  $.ajax({
-		  url: 'index.php',
-		  type:'POST',
-		  dataType:'json',
-		  data: {act:'Meta/volumedele/'+$('#SYSTEMID').data('set')},
-		  beforeSend: 	function(){ system_loading();  },
-		  error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
-		  success: 		function(response) {
-			if(response.action){  
-			  window.close(); 
-			}else{
-			  system_message_alert('',response.info);
-			}
-		  },
-		  complete:		function(){   }
-	  }).done(function() { system_loading();   });
-	  
-	  
-	  
-	}
-	
-	
-	
 	
 	
 	

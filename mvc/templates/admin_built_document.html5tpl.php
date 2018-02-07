@@ -80,7 +80,7 @@
 	
 	
 	$fields_config  = isset($this->vars['server']['data']['dbfield']) 	? $this->vars['server']['data']['dbfield'] : ['volume'=>[],'element'=>[]]; //欄位設定
-	
+	 
 	$dobj_conf  	= isset($this->vars['server']['data']['resouse']['dobj_config'])	? $this->vars['server']['data']['resouse']['dobj_config'] : array();  
 	
 	// 檢查權限
@@ -456,7 +456,7 @@
 					<div class='data_col FIELD_volume_table'  >   
 					  <h1 > 
 					    <span>影像目錄 :</span> 
-					    <button class='dofunc' id='act_create_category' title='新增目錄'><i class="fa fa-plus" aria-hidden="true"></i><b>i</b></button> 
+					    <!--<button class='dofunc' id='act_create_category' title='新增目錄'><i class="fa fa-plus" aria-hidden="true"></i><b>i</b></button> -->
 					  </h1>
 					   
 					  <div class='data_value' > 	
@@ -472,11 +472,11 @@
 								</tr>   
 								 
 								<tr class='data_record _element_read _record_template ' id='' no='' page='' mode='edit' >
-									<td filed='no' >new</td>
-									<td filed='META-E-store_no'> </td>
-									<td filed='META-E-dotype'> </td>
-									<td filed='META-E-doname'> </td>
-									<td filed='META-E-doformat'> </td>
+									<td field='no' >new</td>
+									<td field='META-E-store_no'> </td>
+									<td field='META-E-dotype'> </td>
+									<td field='META-E-doname'> </td>
+									<td field='META-E-doformat'> </td>
 									<td>
 									  <a class='option' >
 										<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -488,11 +488,11 @@
 							<?php $counter=1; ?>
 							<?php foreach($meta_element as $i=>$meta): ?>
 							<tr class='data_record _element_read' id='<?php echo $i;?>' no='<?php echo $i;?>' page='' mode='edit' >
-								<td filed='no' ><?php echo $counter++; ?> </td>
-								<td filed='META-E-store_no'> <?php echo $meta['META-E-file_store_id'];?></td>
-								<td filed='META-E-dotype'> <?php echo $meta['META-E-dotype'];?></td>
-								<td filed='META-E-doname'> <?php echo $meta['META-E-doname'];?></td>
-								<td filed='META-E-doformat'> <?php echo $meta['META-E-doformat'];?></td>
+								<td field='no' ><?php echo $counter++; ?> </td>
+								<td field='META-E-store_no'> <?php echo $meta['META-E-file_store_id'];?></td>
+								<td field='META-E-dotype'> <?php echo $meta['META-E-dotype'];?></td>
+								<td field='META-E-doname'> <?php echo $meta['META-E-doname'];?></td>
+								<td field='META-E-doformat'> <?php echo $meta['META-E-doformat'];?></td>
 								<td>
 								  <a class='option' >
 									<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -826,14 +826,15 @@
 					  <div class='data_col' id='' > 
 					    <label class='data_field '>圖檔類型</label>
 					    <div class='data_value '> 
-                          <?php if(isset( $fields_config['element'][5]) && isset($fields_config['element'][5]['valueset'])): ?>
+                          <?php if(isset( $fields_config['element']['dotype']) && isset($fields_config['element']['dotype']['pattern'])): ?>
+						  <?php $value_sets = explode(';',$fields_config['element']['dotype']['pattern']);?>
 						  <ul class='value_set' >
-						  <?php foreach($fields_config['element'][5]['valueset'] as $item): ?> 
+						  <?php foreach($value_sets as $item): ?> 
 						  <li> <input type='radio' class='_element _detail _variable _update' value='<?php echo $item; ?>' name='META-E-dotype' ><?php echo $item; ?></li>
 						  <?php endforeach; ?>
 						  <li> 
-						    <input type='radio' class='_element _detail _variable _update' value='<?php echo $item; ?>' name='META-E-dotype' >
-						    <input type='text' class='_element _detail _variable' value='' name='META-E-ethnic_newa' placeholder='新增類型' >   
+						    <input type='radio' class='_element _detail _variable _update' value='_newa' name='META-E-dotype' >
+						    <input type='text' class='_element _detail _variable' value='' name='META-E-dotype_newa' placeholder='新增類型' >   
 						  </li>
 						  </ul>
                           <?php else: ?>
@@ -992,7 +993,7 @@
 					 
 				  </span>
 				  <span class='doswitch_function'>
-					<button class='dofunc' id='act_newa_element_meta'	title='編輯影像資料'><i class="fa fa-edit" aria-hidden="true"></i><b>i</b></button>	
+					<button class='dofunc ' id='act_active_element_edit'  title='編輯影像資料'><i class="fa fa-edit" aria-hidden="true"></i><b>i</b></button>	
 					|
 					<button class='dofunc ' id='act_set_item_cover' title='設為封面'>  <i class="fa fa-bookmark" aria-hidden="true"></i> </button>
 					|
