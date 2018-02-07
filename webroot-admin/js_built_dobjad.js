@@ -522,8 +522,7 @@
 	
 
 	//@-- folder 篩選資料夾
-	$('.folder_selecter').change(function(){
-	  
+	$('.folder_selecter').change(function(){  
 	  //cancel_pre_action();
 	  var folder = $(this).val();
 	  if(folder=='' || folder=='_all'){
@@ -538,7 +537,6 @@
 	  }
 	});
 	
-	 
 	
 	//@-- page selecter 跳頁
 	$('.page_selecter').change(function(){
@@ -682,11 +680,8 @@
 		  },
 		  complete:		function(){   }
 	  }).done(function() { system_loading();   });	
-	  
-	  
-		
-	});
 	
+	});
 	
 	//@-- 設定為資料封面
 	$('#act_set_item_cover').click(function(){
@@ -721,8 +716,71 @@
 		  complete:		function(){   }
 	  }).done(function() { system_loading();   });	
 	  
+	});
+  
+  
+    //@-- folder 修改目前影像類別
+	$('#dobj_folder_change').change(function(){  
 	  
-		
+	  var do_name = $('.page_selecter').val()	  
+      
+	  if(!do_name){
+		system_message_alert('','尚未選擇影像');  
+	    return false;
+	  }	  
+	  
+	  // get value 
+	  var folder_now = $('.page_selecter').find("option:selected").parent("optgroup").attr('label');
+	  var folder_new = $(this).val();
+	  $(this).val('');
+	   
+	  if(!folder_new){
+		system_message_alert('','尚未選擇變更類別'); 
+		return false; 
+	  }
+	  
+	  if(folder_new==folder_now){
+		system_message_alert('','類別與原有設定相同');
+        return false; 
+	  }
+	  
+	  // get reference
+	  var dataroot = $('meta#DATAROOT').data('set');  // 資料分類
+	  var dofolder = $('meta#DOFOLDER').data('set');  // 檔案資料夾
+	  
+	  $.ajax({
+		  url: 'index.php',
+		  type:'POST',
+		  dataType:'json',
+		  data: {act:'Meta/doretype/'+dataroot+dofolder+'/'+do_name+'/'+folder_new},
+		  beforeSend: 	function(){ system_loading();  },
+		  error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+		  success: 		function(response) {
+			if(response.action){  
+			   
+			    if(!$('.page_selecter').find("optgroup[label='"+response.data.dobj.type+"']").length){
+			 	    $('.page_selecter').append("<optgroup label='"+response.data.dobj.type+"'></optgroup>")
+				}
+				if(!$('#dobj_folder_select').find("option[value='"+response.data.dobj.type+"']").length){
+					$('#dobj_folder_select').append("<option value='"+response.data.dobj.type+"'>"+response.data.dobj.type+"</option>");
+				}
+				
+			    var option_dom = $('.page_selecter').find("option[value='"+response.data.dobj.name+"']").detach()
+			    $('.page_selecter').find("optgroup[label='"+response.data.dobj.type+"']").append(option_dom)
+			    
+				$(".thumb[p='"+response.data.dobj.name+"']").attr('data-folder',response.data.dobj.type);
+				
+				
+				system_message_alert('alert',response.data.dobj.name+" 設定為新類別 : "+response.data.dobj.type);
+			
+			}else{
+			  system_message_alert('',response.info);
+			}
+		  },
+		  complete:		function(){   }
+	  }).done(function() { system_loading();   });	
+	  
+	  
 	});
   
 	

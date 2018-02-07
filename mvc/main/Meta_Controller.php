@@ -400,14 +400,17 @@
 	  self::data_output('file','',$this->Model->ModelResult); 
 	}
 	
-	// File: 設定封面
+	// AJAX: 設定封面
 	public function dosetcover($DataType,$Folder,$DoFileName){  
 	  $action = $this->Model->ADMeta_Dobj_Set_Cover($DataType,$Folder,$DoFileName);
 	  self::data_output('json','',$this->Model->ModelResult); 
 	}
 	
-	
-	
+	// AJAX: 設定封面
+	public function doretype($DataType,$Folder,$DoFileName,$DoNewType){  
+	  $action = $this->Model->ADMeta_Dobj_Set_Type($DataType,$Folder,$DoFileName,$DoNewType);
+	  self::data_output('json','',$this->Model->ModelResult); 
+	}
 	
 	
 	

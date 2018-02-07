@@ -789,8 +789,7 @@
 				    <button class='dofunc act_switch_element' to='next'	title='切換下一件'> 下一件 <i class="fa fa-chevron-right" aria-hidden="true"></i> <b>c</b></button>
 				  </span>
 				  <span  class='record_tasks'>  
-				    <button class='dofunc' id='act_newa_element_meta'	title='新增單件資料'><i class="fa fa-plus" aria-hidden="true"></i><b>i</b></button>	
-					<button class='dofunc' id='act_save_element_meta'	title='儲存單件資料'><i class="fa fa-floppy-o" aria-hidden="true"></i><b>x</b></button>	
+				    <button class='dofunc' id='act_save_element_meta'	title='儲存單件資料'><i class="fa fa-floppy-o" aria-hidden="true"></i><b>x</b></button>	
 				  </span>
 				</header> 
 				<div class='record_body'>
@@ -963,9 +962,15 @@
 				<header >
 				  <span class='dooption_function'>
 				    <span class='option md_anchor' ><i class="fa fa-thumb-tack" aria-hidden="true"></i><i class="fa fa-arrows-alt" aria-hidden="true"></i></span>
+					
 					<button class='dofunc ' id='act_dolist_admin' title='開啟列表'>  <i class="fa fa-list" aria-hidden="true"></i>/<i class="fa fa-upload" aria-hidden="true"></i>  </button>
 					|
-					<button class='dofunc ' id='act_set_item_cover' title='設為封面'>  <i class="fa fa-bookmark" aria-hidden="true"></i> </button>
+					<select id='dobj_folder_change' >
+					  <option value='' selected disabled> 修改類別 </option>
+					  <?php foreach($dobj_conf['dotypes'] as $dotype):?>
+                      <option value='<?php echo $dotype;?>' ><?php echo $dotype;?></option>
+					  <?php endforeach;?>
+					</select>
 				  </span>
 				  <span class='dotarget_function'>
 				    <select class='folder_selecter'  id='dobj_folder_select'  >
@@ -987,8 +992,11 @@
 					 
 				  </span>
 				  <span class='doswitch_function'>
-				    <button class='dofunc ' id='act_download_stored' title='下載原始圖檔'>  <i class="fa fa-download" aria-hidden="true"></i>  </button>
-					
+					<button class='dofunc' id='act_newa_element_meta'	title='編輯影像資料'><i class="fa fa-edit" aria-hidden="true"></i><b>i</b></button>	
+					|
+					<button class='dofunc ' id='act_set_item_cover' title='設為封面'>  <i class="fa fa-bookmark" aria-hidden="true"></i> </button>
+					|
+					<button class='dofunc ' id='act_download_stored' title='下載原始圖檔'>  <i class="fa fa-download" aria-hidden="true"></i>  </button>
 					|
 					<button class='dofunc page_switch'  mode='dprev' title='前一頁'>  <i class="fa fa-step-backward" aria-hidden="true"></i><b><i class="fa fa-arrow-left" aria-hidden="true"></i></b></button>
 					<button class='dofunc page_switch'  mode='dnext' title='後一頁'>  <i class="fa fa-step-forward" aria-hidden="true"></i></i><b><i class="fa fa-arrow-right" aria-hidden="true"></i></b> </button>
@@ -1079,12 +1087,14 @@
 					  <select id='act_adfile_conf_switch' prehead='adfile' >
 					    <option value='initial' selected >選擇功能</option>
 						<optgroup label='修改' >
-					      <option value='rename'  > - 重新順號 </option>
+					      <!-- <option value='rename'  > - 重新順號 </option>-->
 						  <option value='reorder' > - 變更順序 </option>
 					    </optgroup>
+						<!--
 						<optgroup label='輸出' >
 					      <option value='download' disabled > - 打包下載 </option>
 					    </optgroup>
+						-->
 						<optgroup label='刪除' >
 						   <option value='delete'  > - 刪除勾選 </option>
 					    </optgroup>
@@ -1151,7 +1161,7 @@
 					  <label>待上傳列表：<span id='num_of_queue' >..</span></label>
 					  <div class='upload_action'>
 						
-						<span>來源：</span>
+						<span>類型：</span>
 						<?php if(isset( $dobj_conf['dotypes']) && count($dobj_conf['dotypes'])): ?>
 						  <select id='upload_do_type'>
 						  <?php foreach($dobj_conf['dotypes'] as $dtype): ?> 

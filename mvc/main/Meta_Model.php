@@ -1794,6 +1794,7 @@
             
 			// 建立數位物件設定檔
 			$do_conf = array('store'=>$digital_object_path  , 'saved'=>date('Y-m-d H:i:s') , 'items'=>[] ,'dotype'=>['文物卡','整理照','出版照','相片','底片','翻拍','其他']);
+			
 			foreach($dobj_list as $i=>$do){
 			  if(!file_exists($digital_object_path.$do)) continue;
 			  
@@ -1875,7 +1876,10 @@
 			
 			$dobj_config = $do_conf['items'];
 		  }else{
+			
+			$do_conf     = $dobj_profile; 
 			$dobj_config = $dobj_profile['items'];  
+		  
 		  }
 		  
 		  $dobj_config = $dobj_config ? $dobj_config : $dobj_list;
@@ -4025,7 +4029,91 @@
 	
 	
 	
+	//-- Admin Meta : DOBJ File Download Prepare
+	// [input] : DataType    : ARCHIVE....
+	// [input] : DataFolder  : collection id // file folder 
+	// [input] : DoFileName  : digital file name 
+	// [input] : DoNewType   : digital file type
 	
+	public function ADMeta_Dobj_Set_Type( $DataType='' , $DataFolder='' , $DoFileName='', $DoNewType=''){
+	  
+	  $result_key = parent::Initial_Result('dobj');
+	  $result  = &$this->ModelResult[$result_key];
+	  
+	  try{  
+		
+		// 檢查DO資料設定
+	    $profile_path = _SYSTEM_DIGITAL_FILE_PATH.$DataType.'/profile/'.$DataFolder.'.conf';
+		if(!file_exists($profile_path)){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');	
+		}
+		
+		// 讀取DO設定
+		$dobj_config = file_get_contents($profile_path);
+		$dobj_profile = json_decode($dobj_config,true);
+		if( !$dobj_profile || ( !isset($dobj_profile['items']) || !is_array($dobj_profile['items']))){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');		
+		}
+		
+		//確認實體檔案
+		$dobj_path = [];
+		$dobj_path['saved']  = _SYSTEM_DIGITAL_FILE_PATH.$DataType.'/saved/'.$DataFolder.'/'.$DoFileName;
+		$dobj_path['browse'] = _SYSTEM_DIGITAL_FILE_PATH.$DataType.'/browse/'.$DataFolder.'/'.$DoFileName;
+		$dobj_path['thumb']  = _SYSTEM_DIGITAL_FILE_PATH.$DataType.'/thumb/'.$DataFolder.'/'.$DoFileName;
+		
+		$dobj_download = '';
+		foreach($dobj_path as $dotype => $dopath){
+          if(!file_exists($dopath)){ continue; }		
+          $dobj_download = $dopath;
+		  break;
+		}
+		
+		foreach($dobj_profile['items'] as $i=>$doconf){  
+		  if($doconf['file'] != $DoFileName){
+			continue;  
+		  }
+		  $dobj_profile['items'][$i]['dotype'] = $DoNewType;	
+		}
+		
+		if(!isset($dobj_profile['dotype'])){
+		  $dobj_profile['dotype'] = ['文物卡','整理照','出版照','相片','底片','翻拍','其他'];
+		}
+		
+		if(!in_array($DoNewType,$dobj_profile['dotype'])){
+		  $dobj_profile['dotype'] = array_unshift($dobj_profile['dotype'],$DoNewType);	
+		}
+		
+		file_put_contents($profile_path,json_encode($dobj_profile));
+		
+		/*
+		// 執行修改
+		$DB_SAVE= $this->DBLink->prepare(SQL_AdMeta::UPDATE_SOURCE_META(array_keys($source_update), 'source_digiarchive'));
+		$DB_SAVE->bindValue(':id'    , $DataFolder);
+		foreach($source_update as $uf=>$uv){
+		  $DB_SAVE->bindValue(':'.$uf , $uv);
+		}
+		$DB_SAVE->execute();
+		
+		// 執行更新 meta
+		$DB_SAVE= $this->DBLink->prepare(SQL_AdMeta::UPDATE_METADATA_DATA(array('_index'), 'collection'));
+		$DB_SAVE->bindValue(':sid'    , $DataFolder);
+		$DB_SAVE->bindValue(':_index' , 0);
+		$DB_SAVE->execute();
+		
+		$active = self::ADMeta_Process_Meta_Update();
+		*/
+		
+		// final 
+		$result['data']['name']   = $DoFileName;
+		$result['data']['type']   = $DoNewType;
+		
+		$result['action'] = true;
+    	
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;  
+	}
 	
 	
 	
