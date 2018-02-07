@@ -70,6 +70,50 @@
 	}
 	
 	
+	/* [ 批次上傳部分 ] */
+	
+	// POST: 批次檔案(excel)上傳
+	public function batchupload($Class){
+	  $this->Model->ADMeta_Upload_Batch_File($Class,$_FILES);
+	  self::data_output('html','admin_callback_batchupload',$this->Model->ModelResult); 
+	}
+	
+	// AJAX: 檢查上傳資料
+	public function batchcheck($UploadFileKey){
+	  $this->Model->ADMeta_Check_Batch_File($UploadFileKey);
+	  self::data_output('json','',$this->Model->ModelResult);
+	}
+	
+	// AJAX: 取得檢驗資料
+	public function batchrevise($ReviseFileKey){
+	  $this->Model->ADMeta_Prepare_Batch_Revise($ReviseFileKey);
+	  self::data_output('json','',$this->Model->ModelResult);
+	}
+	
+	// AJAX: 更新上傳資料
+	public function batchimport($ReviseFileKey){
+	  $this->Model->ADMeta_Update_Batch_Revise($ReviseFileKey);
+	  $this->Model->ADMeta_Process_Meta_Update();  // 更新系統meta
+	  self::data_output('json','',$this->Model->ModelResult);
+	}
+	
+	// AJAX: 取得重整資料
+	public function batchrenew($ReviseFileKey){
+	  $this->Model->ADMeta_Renew_Batch_Select($ReviseFileKey);
+	  self::data_output('json','',$this->Model->ModelResult);
+	}
+	
+	// AJAX: 取得跳過資料
+	public function batchskip($ReviseFileKey){
+	  $active = $this->Model->ADMeta_Select_Batch_Detect($ReviseFileKey);
+	  if($active['action']){
+		$this->Model->ADMeta_Prepare_Batch_Revise($active['data']);   
+	  }
+	  self::data_output('json','',$this->Model->ModelResult);
+	}
+	
+	
+	
 	
 	
 	/* [ 新增文物資料 ] */

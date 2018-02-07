@@ -745,13 +745,7 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	});
 	
 	
-	
-	
-	
-	
-	
-	
-	
+	 
 	
 	/* [Meta Batch Upload] */
 	
@@ -768,10 +762,10 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	$(document).on('click','#act_upload_batch_excel',function(){  
 	  
 	  // get id
-	  var data_class = $('#zong_class').length ? $('#zong_class').data('value') : '';
+	  var data_class = 'relic';
 	  var active_dom = $(this);
 	   
-	  if( ! data_class){
+	  if( !data_class){
 	    system_message_alert('',"資料錯誤");
 		return false;
 	  }
@@ -792,7 +786,7 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	  
 	  system_loading();
 	  var action = $('#file_upload_form').attr('action');
-	  $('#file_upload_form').attr('action',action+'/'+data_class);
+	  $('#file_upload_form').attr('action',action+data_class);
 	  var FormObj = document.getElementById('file_upload_form'); 
 	  FormObj.submit();
 	  $('#file_upload_form').attr('action',action);

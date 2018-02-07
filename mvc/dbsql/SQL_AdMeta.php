@@ -91,6 +91,14 @@
 	  return $SQL_String;
 	}
 	
+	//-- Admin Meta : export meta current
+	public static function GET_EXPORT_CURRENT_META(){
+	  $SQL_String = "SELECT system_id,class,data_type,applyindex,source_json FROM logs_export LEFT JOIN metadata ON meta_id=system_id WHERE export_key=:key;";
+	  return $SQL_String;
+	}
+	
+	
+	
    
 	//-- Admin Built : get source meta
 	public static function GET_SOURCE_META($DBTableName='source_digiarchive',$LinkField='store_no'){

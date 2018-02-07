@@ -19,6 +19,7 @@
 	<!-- Self -->
 	<link rel="stylesheet" type="text/css" href="theme/css/css_default.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_main.css" />
+	<link rel="stylesheet" type="text/css" href="theme/css/css_ad10.css" />
 	<link rel="stylesheet" type="text/css" href="theme/css/css_meta_admin.css" />
 	
 	<script type="text/javascript" src="js_library.js"></script>
@@ -242,7 +243,7 @@
 				<select id='act_record_batch_to'>
 				  <optgroup label='匯出勾選' >
 				    <option value='export'   title='匯出勾選資料' >批次匯出</option>
-					<option value='import'   title='回傳更新'     disabled >批次匯入-尚未開放</option>
+					<option value='import'   title='回傳更新'  >批次匯入</option>
 					<option value='print' title='勾選匯出報表' >列印報表</option>
 				  </optgroup>
 				  <optgroup label='創建群組' id='folder_list' >
@@ -760,7 +761,7 @@
 			  </h1>
 			  <div class='batch_file_checker'>
 				<div class="progress progress-large" id='upload_check_process' >
-				  <span style="width: 0%">0%</span>
+				  <!--<span style="width: 0%">0%</span>-->
 				</div>
 				<table id='upload_check_table'>
 				  <tr>
@@ -805,9 +806,11 @@
 			</div>
 			<div class='md_footer'>
 			  <div>
+			  <!--
 			    <span>批次更新結果</span> 
 				<button id='act_renew_batch_file'><i class="fa fa-file-excel-o" aria-hidden="true"></i> 重新下載更新後批次資料 </button>
 			    <button id='act_renew_batch_skip'><i class="fa fa-file-excel-o" aria-hidden="true"></i> 下載檢測有問題部分</button>
+			  -->
 			  </div>
 			  <div>
 				<button type="button" class="cancel" id="act_meta_batch_cancel">取消</button>

@@ -15,6 +15,8 @@
 	
 	protected $Metadata;
 	
+	protected $SourceTableIndexFild = 'store_no';  //資料索引欄位  , 用來做為跨資料互相參照index的欄位
+	
 	/*[ Meta Function Set ]*/ 
     
 	//-- Admin Meta Process Search Filter 
@@ -2413,11 +2415,6 @@
 	  
 	  try{  
 		
-		// 檢查序號
-	    if(!preg_match('/^[\w\d]+$/',$VolumeId)){
-		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
-		}
-	    
 		// 欄位資料
 		if(!is_array($pass_meta) || count($pass_meta) ){
           //throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
@@ -2425,9 +2422,16 @@
 		
 		$element_store_no = '';
 		if( $SourceStoreNo == '_addnew' ){
+			
+		  // 檢查序號
+	      if(!preg_match('/^[\w\d]+$/',$VolumeId)){
+		    throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+		  }	
+			
 		  $active = self::ADBuilt_Newa_Element_Data($VolumeId);
 		  if(!$active['action']) throw new Exception('');	  // 新增失敗
 		  $element_store_no = $active['data']['store_no']; // source seno
+		
 		}else{
 		  $element_store_no =  $SourceStoreNo;
 		}
@@ -2441,6 +2445,7 @@
 		}
 		
 		$system_id = $element_meta['system_id'];
+		$volume_id = $element_meta['collection_id'];
 		
 		
 		// 檢查更新欄位是否合法
@@ -2493,8 +2498,8 @@
 		// 清空keeper
 		$editor_config_file = _SYSTEM_USER_PATH.$this->USER->UserID.'/editor.conf';
 		$editor_config_array = (file_exists($editor_config_file)) ? json_decode(file_get_contents($editor_config_file),true) : [];  
-	    if(isset($editor_config_array['editkeep'][$VolumeId.'@'.$element_store_no])){
-		  unset($editor_config_array['editkeep'][$VolumeId.'@'.$element_store_no]);
+	    if(isset($editor_config_array['editkeep'][$volume_id.'@'.$element_store_no])){
+		  unset($editor_config_array['editkeep'][$volume_id.'@'.$element_store_no]);
 		  file_put_contents($editor_config_file,json_encode($editor_config_array));
 		}
 		
@@ -5145,6 +5150,1316 @@
       }
 	  return $result;
 	}
+	
+	
+	
+	
+	
+	//-- Upload Batch File  // 上傳批次處理檔案
+	// [input] : MetaClass : 001/002
+	// [input] : FILES : [array] - System _FILES Array;
+	public function ADMeta_Upload_Batch_File( $MetaClass='' , $FILES = array()){
+	  
+	  $result_key = parent::Initial_Result('');
+	  $result  = &$this->ModelResult[$result_key];
+	  
+      // [name] => MyFile.jpg  / [type] => image/jpeg  /  [tmp_name] => /tmp/php/php6hst32 / [error] => UPLOAD_ERR_OK / [size] => 98174
+	  // Allowed extentions.
+      $allowedExts = array("xls","xlsx");
+       
+	  try{
+		
+		// Get filename.
+        $temp = explode(".", $FILES["file"]["name"]);
+        // Get extension.
+        $extension = end($temp);
+		
+		// 檢查上傳檔案資訊
+		if (!in_array(strtolower($extension), $allowedExts)) {
+	      throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+	    }	
+		
+        if( $FILES["file"]["error"] ){
+          throw new Exception('_SYSTEM_UPLOAD_ERROR:'.$FILES["file"]["error"]);  
+        }
+		
+	    // Validate uploaded files.
+	    // Do not use $_FILES["file"]["type"] as it can be easily forged.
+	    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+	    $mime  = finfo_file($finfo, $FILES["file"]["tmp_name"]);
+		
+		$upload_folder = _SYSTEM_DIGITAL_FILE_PATH.'UPLOAD/'.$this->USER->UserID.'/';
+		$upload_batch_key  = $MetaClass.'-'.date('YmdHis');
+		$upload_batch_file = $upload_batch_key.'.'.$extension;
+		
+		
+		// 轉存位置
+		if(!is_dir($upload_folder)) mkdir($upload_folder,0777,true);
+		move_uploaded_file($FILES["file"]["tmp_name"],$upload_folder.$upload_batch_file);
+		
+		// 檢查檔案
+		if(!$new_batch_size = filesize($upload_folder.$upload_batch_file)){
+		  throw new Exception('_META_BATCH_MOVE_FAIL');	
+		}
+		
+		$result['data']['file'] = $FILES["file"]["name"];
+		$result['data']['save'] = $upload_batch_file;
+		$result['data']['size'] = $new_batch_size;
+		$result['action'] = true;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;
+	}
+	
+	
+	
+	//-- Check Upload Excel File  // 檢查批次處理檔案
+	// [input] : UploadFile : PUBLICATION-date()
+	public function ADMeta_Check_Batch_File( $UploadFile='' ){
+	  
+	  $result_key = parent::Initial_Result('');
+	  $result  = &$this->ModelResult[$result_key];
+	  
+	  function colnum2code($colnumber){ //COL欄位轉換
+		/*range A - ZZ */
+		$col_range = range('A','Z');
+		$col_index = intval($colnumber);
+		$col_code  = '';
+		if(intval($col_index/26)){
+		  $col_code = $col_range[intval($col_index/26)-1];
+		  $col_code .= ($col_index%26) ? $col_range[($col_index%26-1)]:'A'; 
+		}else{
+		  $col_code	= $col_range[$col_index];
+		}
+		return $col_code;
+	  }
+	  
+	  try{
+	    
+		$upload_folder = _SYSTEM_DIGITAL_FILE_PATH.'UPLOAD/'.$this->USER->UserID.'/';
+		
+		if(!file_exists($upload_folder.$UploadFile)){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+		}
+		
+		$objReader = PHPExcel_IOFactory::createReaderForFile($upload_folder.$UploadFile);
+	    $objPHPExcel = $objReader->load($upload_folder.$UploadFile);
+		$main_sheet = $objPHPExcel->setActiveSheetIndex(0);
+	    
+		
+		//取得處理參數
+		$meta_class   = $main_sheet->getCellByColumnAndRow(1,1)->getValue();
+		$meta_version = $main_sheet->getCellByColumnAndRow(1,2)->getValue();
+		$meta_key     = $main_sheet->getCellByColumnAndRow(1,3)->getValue(); 
+	    
+		$frow_start   = 5;
+		
+		// 設定資料集相關
+		$fformat = [0=>[],1=>[]];
+		$freference[0]['level'] = [];
+		$zclass = [];
+		
+		// 取得全宗分類資料
+		$DB_CLASS = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_CLASS());
+		$DB_CLASS->bindParam(':zclass', $meta_class );	
+		if( !$DB_CLASS->execute()){
+		  throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');
+		}
+		$zclass =  $DB_CLASS->fetch(PDO::FETCH_ASSOC);
+			
+		// 建構全宗分類
+		$DB_ZLV = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_LEVEL());
+		function builtzongclass($dblink,$bindno,$znamepre,$zlevel){
+			$dblink->bindParam(':mcno', $bindno );	
+			$dblink->execute();          
+			$lvs = $dblink->fetchAll(PDO::FETCH_ASSOC);
+			  
+			if(count($lvs)){
+			  foreach($lvs as $lv){
+				$zlevel[$lv['class_code']] = $znamepre.'/'.$lv['class_name'];	
+				$zlevel = $zlevel+builtzongclass($dblink,$lv['mcno'],$znamepre.'/'.$lv['class_name'],$zlevel);    
+			  }  
+			}
+			return  $zlevel; 
+		}
+			
+		if(isset($zclass['mcno'])){
+		  $class_level = builtzongclass($DB_ZLV,$zclass['mcno'],$zclass['class_name'],[]);
+		  if(is_array($class_level)&&count($class_level)){
+			$freference[0]['level'] = array_keys($class_level);	
+			$freference[0]['series'] = array_values($class_level);	
+		  }
+		}
+		
+		
+		switch($meta_class){
+		    case 'relic':		
+			  // 取得卷欄位檢測參考表  meta_format
+			  $DB_MTINFO = $this->DBLink->prepare( SQL_AdMeta::GET_DB_TABL_FORMAT());
+			  $DB_MTINFO->bindValue(':dbtable','source_digiarchive');
+			  $DB_MTINFO->execute();
+			  while($field = $DB_MTINFO->fetch(PDO::FETCH_ASSOC)){
+				$fformat[0][$field['dbcolumn']] = $field;
+				if($field['module']=='S' && $field['pattern']){
+                  $freference[0][$field['dbcolumn']] = explode(';',$field['pattern']);   					
+				}
+			  }
+			  
+			  // 取得件欄位檢測參考表  meta_format 
+			  $DB_MTINFO = $this->DBLink->prepare( SQL_AdMeta::GET_DB_TABL_FORMAT());
+			  $DB_MTINFO->bindValue(':dbtable','source_digielement');
+			  $DB_MTINFO->execute();
+			  while($field = $DB_MTINFO->fetch(PDO::FETCH_ASSOC)){
+				$fformat[1][$field['dbcolumn']] = $field;
+				if($field['module']=='S' && $field['pattern']){
+                  $freference[1][$field['dbcolumn']] = explode(';',$field['pattern']);   					
+				}
+			  }
+			  break;
+		      
+			default:
+			  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+			  break;
+		}
+		
+		//取得當前資料版本 - by匯出key
+		$meta_currency = [];
+		
+		$DB_MTNOW = $this->DBLink->prepare( SQL_AdMeta::GET_EXPORT_CURRENT_META());
+	    $DB_MTNOW->bindValue(':key',$meta_key);
+	    $DB_MTNOW->execute();
+	    while($tmp = $DB_MTNOW->fetch(PDO::FETCH_ASSOC)){
+		  if(!isset($meta_currency[$tmp['class']])) $meta_currency[$tmp['class']]=['volume'=>[],'element'=>[]];
+		  $source = json_decode($tmp['source_json'],true);
+	      if($tmp['data_type']=='collection'){
+			$meta_currency[$tmp['class']]['volume'][$tmp['applyindex']] = $source['collection'];
+		  }else{
+			$meta_currency[$tmp['class']]['element'][$tmp['applyindex']] = $source['element'];  
+		  }
+		}
+		
+		
+		//取得匯出當時的資料狀態
+		$meta_whenexport = [];
+		$export_store = _SYSTEM_DIGITAL_FILE_PATH.'METADATA/export/'.$meta_key.'.json';
+		if(file_exists($export_store)){
+		  $meta_whenexport = json_decode(file_get_contents($export_store),true);	
+		}
+		
+		
+		//掃描excel檔案
+		$sheet_count = $objPHPExcel->getSheetCount();
+		$sheet_check = [
+		  'insert'=>[],
+		  'delete'=>[],
+		  'conflict'=>[],
+		  'modify'=>[],
+		  'fail'=>[],
+		  'total'=>0
+		];
+		
+		$sheet_type_map = [0=>'volume',1=>'element']; 
+		
+		for($shindex=0;$shindex<2;$shindex++){
+		  
+		  $meta_sheet = $objPHPExcel->setActiveSheetIndex($shindex);
+		  $meta_sheet_name = $objPHPExcel->getActiveSheet()->getTitle();  
+		  
+		  // get meta field
+		  $col = 0;
+		  $meta_fileds   = [];
+		  $meta_col2field = [];
+		  
+		  $fcounter = 0;
+		  while( $f = trim($meta_sheet->getCellByColumnAndRow($col,$frow_start)->getValue())){
+            
+			$meta_fileds[$f]=[
+		      'index'	=> $col,
+			  'field'	=> $f,
+			  'name'	=> trim($meta_sheet->getCellByColumnAndRow($col,($frow_start-1))->getValue()),
+		      'format'	=> (isset($fformat[$shindex][$f]) ? $fformat[$shindex][$f] : []),
+			  'refer' 	=> (isset($freference[$shindex][$f]) ? $freference[$shindex][$f] : [])
+		    ];
+			$meta_col2field[$col] = $f;
+			$col++;
+		    if($fcounter++ > 100 ) break; // 防止迴圈
+		  }
+		  
+		  // get meta sheet
+		  $mcol_start   = 0;
+		  $mrow_start   = 6;
+		  $mcol_finish  = count($meta_fileds);
+		  
+		  $frow = $mrow_start; 
+		  $read_exit_fleg = 0;
+		  $meta_records = [];
+		  
+		  do{
+			
+			$meta_xlsread = [];  //從excel中讀取之資料
+			$meta_linkfld = '';  //跨資料版本之索引號碼 
+			
+			for($fcol=$mcol_start ; $fcol<$mcol_finish ; $fcol++ ){
+			  $cell = trim($meta_sheet->getCellByColumnAndRow($fcol,$frow)->getValue());  
+		      if(substr($cell,0,1)=='='){
+				$cell = trim($meta_sheet->getCellByColumnAndRow($fcol,$frow)->getFormattedValue());
+			  }
+			  $meta_xlsread[$meta_col2field[$fcol]] = $cell;
+			  if($meta_col2field[$fcol] == $this->SourceTableIndexFild){
+				$meta_linkfld = $cell; 
+			  }
+			} 
+		    
+			if(!count(array_filter($meta_xlsread))){  // 若為空值
+			  $read_exit_fleg++;
+			
+			}else{
+			  
+			  // 取得其他參照版本
+			  $meta_db_record = isset($meta_currency[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld]) ? $meta_currency[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld] :[];
+			  $meta_ep_record = isset($meta_whenexport[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld]) ? $meta_whenexport[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld] :[];
+				
+				
+		      //檢測資料
+			  foreach($meta_xlsread as $mf => $mv){  
+				  
+				  if(!isset($meta_fileds[$mf])) continue;
+				  
+				  $format_pass = true;  
+				  $notconflict = true;  
+				  
+				  $cellid  = [colnum2code($meta_fileds[$mf]['index']),$frow];
+				  $checker = isset($meta_fileds[$mf]['format']) ? $meta_fileds[$mf]['format'] : [];
+				  	
+				  //check if auto new
+				  if($checker['autonew']){
+					if($mv=='+'){
+					  $sheet_check['insert'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => '第 '.$frow.' 行',  //colnum2code($meta_fileds[$mf]['index']).':'.$frow
+						'descrip' => join(', ',array_values($meta_xlsread)),
+					  ];  
+					}else if($mv=='-'){
+					  $sheet_check['delete'][] = [
+					    'cellid'  => '第 '.$frow.' 行',  //colnum2code($meta_fileds[$mf]['index']).':'.$frow
+					  ];    
+					}
+			      }
+				  
+				  //check if empty
+				  if($checker['nessary'] && $mv=='' ){
+					$sheet_check['fail'][] = [
+					  'sheet'   => $meta_sheet_name,
+					  'cellid'  => join(':',$cellid),
+					  'column'  => $meta_fileds[$mf]['name'],
+					  'content' => '',
+					  'descrip' => '此欄位不可為空',
+					];
+					$format_pass = false;
+				  
+				  }else if($checker['fromsys'] && isset($freference[$shindex][$mf])){
+					//check from system
+					$valrefer = $freference[$shindex][$mf];  
+					if(!in_array($mv,$valrefer)){
+					  $sheet_check['fail'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $mv,
+					    'descrip' => '資料不合法，請使用系統設定值',
+					  ];
+					  $format_pass = false;
+					}  
+			      }else{
+					
+					switch($checker['module']){
+						case 'R': if(!preg_match($checker['pattern'],$mv)){ $format_pass=false; } break;
+						case 'V': if( $checker['pattern']!=$mv){ $format_pass=false;} break;
+						case 'S':	if( $mv!='' && !in_array($mv,explode(';',$checker['pattern']))){ $format_pass=false; } break;				  
+						default: break;	
+					}
+					if(!$format_pass){
+					  $sheet_check['fail'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $mv,
+					    'descrip' => '格式錯誤'.($checker['descrip'] ? ' : '.$checker['descrip'] : ''),
+					  ];
+					}
+				  }
+				  
+				  
+				  // 檢視是否修改
+				  if(isset($meta_ep_record[$mf]) && $meta_ep_record[$mf] != $mv){
+					$sheet_check['modify'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $mv,
+					    'descrip' => '資料修改 : '.$mv,
+					];
+				  }
+				  
+				  // 檢視是否碰撞  目前資料版本已與匯出時不同
+				  if(isset($meta_db_record[$mf]) && isset($meta_ep_record[$mf]) && $meta_db_record[$mf] != $meta_ep_record[$mf]){
+					$sheet_check['conflict'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $meta_db_record[$mf],
+					    'descrip' => '資料已變更 : '.$meta_db_record['_timeupdate'].'由'.$meta_db_record['_userupdate'].'修改',
+					];
+					$notconflict = false;
+				  }
+				  
+				  //錯誤標示於excel
+			      $cell_style['fill'] = array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => 'ff4500')
+				  );
+			      if(!$format_pass){
+					$meta_sheet->getStyle(join('',$cellid).':'.join('',$cellid))->applyFromArray($cell_style);	  
+				  }
+				  
+				  //衝突標示excel
+			      $cell_style['fill'] = array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => '888888')
+				  );
+			      if(!$notconflict){
+					$meta_sheet->getStyle(join('',$cellid).':'.join('',$cellid))->applyFromArray($cell_style);	  
+				  }
+				  
+				  
+				  
+			  }
+			  $sheet_check['total']++;
+			}
+			$frow++;
+		  }while($read_exit_fleg < 10);
+		  
+		}
+		
+		$excel_file_name = preg_replace('/(\.xls)/','-C\\1',$UploadFile);
+		$objPHPExcel->setActiveSheetIndex(0);
+	    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+	    $objWriter->save($upload_folder.$excel_file_name); 
+		unset($objPHPExcel);
+		
+		// final
+		$result['action'] = true;
+		$result['data']['license'] = count($meta_currency) ? 1 : 0;
+		$result['data']['check']   = $sheet_check;
+		$result['data']['fname']   = $excel_file_name;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;
+	}
+	
+	
+	
+	//-- Prepare Revise File to User  // 準備檢驗檔案提供使用者下載
+	// [input] : ReviseFile :
+	public function ADMeta_Prepare_Batch_Revise( $ReviseFile='' ){
+	  
+	  $result_key = parent::Initial_Result('revise');
+	  $result  = &$this->ModelResult[$result_key];
+	  
+	  try{
+	     
+        $upload_folder = _SYSTEM_DIGITAL_FILE_PATH.'UPLOAD/'.$this->USER->UserID.'/';
+         
+		if(!file_exists($upload_folder.$ReviseFile)){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');	
+		}
+		
+		$file_path   = _SYSTEM_USER_PATH.$this->USER->UserID.'/';
+		$file_revise = _SYSTEM_NAME_SHORT.'_alert_'.date('Ymd').'.xlsx';
+		
+		copy($upload_folder.$ReviseFile,$file_path.$file_revise);
+		
+		// final
+		$result['action'] = true;
+		$result['data']['fname']   = pathinfo($file_path.$file_revise,PATHINFO_FILENAME );
+		$result['data']['date']    = date('Y-m-d H:i:s');
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;
+	}
+	
+	
+    // !!!***尚缺功能部分***!!!
+	// 更新修正  ( 屏除錯誤紀錄 )
+	// 下載  1.錯誤資料 2.下載全部範圍(原檢測資料範圍)
+	// 快速取代工具
+	// 檢查 process
+	// 更新 process
+	
+	
+	//-- Check Upload Excel File  // 檢查批次處理檔案
+	// [input] : UploadFile : PUBLICATION-date()-C
+	public function ADMeta_Update_Batch_Revise( $UploadFile='' ){
+	  
+	  function colnum2code($colnumber){ //COL欄位轉換
+		/*range A - ZZ */
+		$col_range = range('A','Z');
+		$col_index = intval($colnumber);
+		$col_code  = '';
+		if(intval($col_index/26)){
+		  $col_code = $col_range[intval($col_index/26)-1];
+		  $col_code .= ($col_index%26) ? $col_range[($col_index%26-1)]:'A'; 
+		}else{
+		  $col_code	= $col_range[$col_index];
+		}
+		return $col_code;
+	  }
+	  
+	  $result_key = parent::Initial_Result('batch');
+	  $result  = &$this->ModelResult[$result_key];
+	  
+	  try{
+	    
+		$upload_folder = _SYSTEM_DIGITAL_FILE_PATH.'UPLOAD/'.$this->USER->UserID.'/';
+		
+		if(!file_exists($upload_folder.$UploadFile)){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+		}
+		
+		$objReader = PHPExcel_IOFactory::createReaderForFile($upload_folder.$UploadFile);
+	    $objPHPExcel = $objReader->load($upload_folder.$UploadFile);
+		$main_sheet = $objPHPExcel->setActiveSheetIndex(0);
+	    
+		
+		//取得處理參數
+		$meta_class   = $main_sheet->getCellByColumnAndRow(1,1)->getValue();
+		$meta_version = $main_sheet->getCellByColumnAndRow(1,2)->getValue();
+		$meta_key     = $main_sheet->getCellByColumnAndRow(1,3)->getValue(); 
+	    
+		$frow_start   = 5;
+		$update_counter = 0;
+		
+		
+		//掃描excel檔案
+		$sheet_count = $objPHPExcel->getSheetCount();
+		
+		
+		$sheet_type_map = [0=>'volume',1=>'element']; 
+		
+		for($shindex=0;$shindex<2;$shindex++){
+		  
+		  $meta_sheet = $objPHPExcel->setActiveSheetIndex($shindex);
+		  $meta_sheet_name = $objPHPExcel->getActiveSheet()->getTitle();  
+		  
+		  // get meta field
+		  $col = 0;
+		  $meta_col2field = [];
+		  
+		  $fcounter = 0;
+		  while( $f = trim($meta_sheet->getCellByColumnAndRow($col,$frow_start)->getValue())){
+            $meta_col2field[$col] = $f;
+			$col++;
+		    if($fcounter++ > 100 ) break; // 防止迴圈
+		  }
+		  
+		  // get meta sheet
+		  $mcol_start   = 0;
+		  $mrow_start   = 6;
+		  $mcol_finish  = count($meta_col2field);
+		  
+		  $frow = $mrow_start; 
+		  $read_exit_fleg = 0;
+		  $meta_records = [];
+		  
+		  do{
+			
+			$meta_xlsread = [];  //從excel中讀取之資料
+			$meta_linkfld = '';  //跨資料版本之索引號碼 
+			
+			$meta_hasfail = false;
+			$meta_update_field_header = 'META-'.strtoupper(substr($sheet_type_map[$shindex],0,1)).'-';
+			for($fcol=$mcol_start ; $fcol<$mcol_finish ; $fcol++ ){
+			  
+			  $cellid  = [colnum2code($fcol),$frow];
+			  $cell    = trim($meta_sheet->getCellByColumnAndRow($fcol,$frow)->getValue());  
+		      if(substr($cell,0,1)=='='){
+				$cell = trim($meta_sheet->getCellByColumnAndRow($fcol,$frow)->getFormattedValue());
+			  }
+			  if($meta_col2field[$fcol] == $this->SourceTableIndexFild){
+				$meta_linkfld = $cell; 
+			  }
+			  $cell_color = strtolower($meta_sheet->getStyle(join('',$cellid).':'.join('',$cellid))->getFill()->getStartColor()->getRGB());
+			  
+			  if(!$meta_hasfail && ($cell_color=='ff4500' || $cell_color=='888888') ){  //ff4500 格式有誤  //888888版本不同
+				$meta_hasfail = true;  
+			  }
+			  
+			  if($cell_color=='7f7f7f' || $cell_color=='eeee8aa' ){  continue; }  // 系統資料不可修改
+			  
+			  // 準備更新格式  'META-V-{field}'
+			  $update_field = $meta_update_field_header.$meta_col2field[$fcol];
+			  $meta_xlsread[$update_field] = $cell;
+			  
+			} 
+			
+			if(!count(array_filter($meta_xlsread))){  // 若為空值
+			  $read_exit_fleg++;
+			}else if(!$meta_hasfail && $meta_linkfld){
+			  
+			  //更新資料
+			  $data_modify = rawurlencode(str_replace('/','*',base64_encode(json_encode($meta_xlsread)))); 
+			  
+			  if($sheet_type_map[$shindex]=='volume'){
+				$update = self::ADBuilt_Save_Volume_Meta( $meta_linkfld , $data_modify);   
+			  }else{
+				$update = self::ADBuilt_Save_Element_Data( '', $meta_linkfld , $data_modify);    
+			  }
+			  if($update['action']) $update_counter++; 
+			  unset($this->ModelResult['save']); 
+			}
+			
+			$frow++;
+		  }while($read_exit_fleg < 10);  
+		}
+		unset($objPHPExcel);
+		
+		// final
+		$result['action'] = true;
+	    $result['data']['update'] = $update_counter;
+		
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;
+	}
+	
+	
+	
+	//-- Admin Meta Export Select Renew Version
+	// [input] : UploadFile ;
+	public function ADMeta_Renew_Batch_Select($UploadFile){
+	  
+	  function colnum2code($colnumber){ //COL欄位轉換
+		/*range A - ZZ */
+		$col_range = range('A','Z');
+		$col_index = intval($colnumber);
+		$col_code  = '';
+		if(intval($col_index/26)){
+		  $col_code = $col_range[intval($col_index/26)-1];
+		  $col_code .= ($col_index%26) ? $col_range[($col_index%26-1)]:'A'; 
+		}else{
+		  $col_code	= $col_range[$col_index];
+		}
+		return $col_code;
+	  }
+		
+	  $result_key = parent::Initial_Result('batch');
+	  $result  = &$this->ModelResult[$result_key];
+	  try{  
+		
+		
+		$upload_folder = _SYSTEM_DIGITAL_FILE_PATH.'UPLOAD/'.$this->USER->UserID.'/';
+		
+		if(!file_exists($upload_folder.$UploadFile)){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+		}
+		
+		$objReader = PHPExcel_IOFactory::createReaderForFile($upload_folder.$UploadFile);
+	    $objPHPExcel = $objReader->load($upload_folder.$UploadFile);
+		$main_sheet = $objPHPExcel->setActiveSheetIndex(0);
+	    
+		//取得處理參數
+		$meta_class   = $main_sheet->getCellByColumnAndRow(1,1)->getValue();
+		$meta_version = $main_sheet->getCellByColumnAndRow(1,2)->getValue();
+		$meta_key     = $main_sheet->getCellByColumnAndRow(1,3)->getValue(); 
+	    
+		//取得當前資料版本 - by匯出key
+		$meta_currency = [];
+		$data_batch_counter = 0;
+		
+		//== 註冊匯出序號
+		$export_key = md5($this->USER->UserID.':'.microtime().':'.$UploadFile);
+		$DB_LOGS = $this->DBLink->prepare( SQL_AdMeta::LOGS_META_EXPORT());
+		$DB_MTNOW = $this->DBLink->prepare( SQL_AdMeta::GET_EXPORT_CURRENT_META());
+	    $DB_MTNOW->bindValue(':key',$meta_key);
+	    $DB_MTNOW->execute();
+	    while($tmp = $DB_MTNOW->fetch(PDO::FETCH_ASSOC)){
+		  if(!isset($meta_currency[$tmp['class']])) $meta_currency[$tmp['class']]=['volume'=>[],'element'=>[]];
+		  $source = json_decode($tmp['source_json'],true);
+	      if($tmp['data_type']=='collection'){
+			$meta_currency[$tmp['class']]['volume'][$tmp['applyindex']] = $source['collection'];
+		    $meta_version = $source['collection']['_timeupdate'];
+		  }else{
+			$meta_currency[$tmp['class']]['element'][$tmp['applyindex']] = $source['element']; 
+            $meta_version = $source['element']['_timeupdate'];			
+		  }
+		
+		  $data_batch_counter++;
+		  // 註冊匯出紀錄
+		  $DB_LOGS->bindValue(':exportkey',$export_key);
+		  $DB_LOGS->bindValue(':system_id',$tmp['system_id']);
+		  $DB_LOGS->bindValue(':meta_version',$meta_version);
+		  $DB_LOGS->bindValue(':user',$this->USER->UserID);
+		  $DB_LOGS->execute();
+		  
+		}
+		
+		//儲存資料匯出版本控制檔
+		$export_store = _SYSTEM_DIGITAL_FILE_PATH.'METADATA/export/'.$export_key.'.json';
+		file_put_contents($export_store,json_encode($meta_currency,JSON_UNESCAPED_UNICODE));
+		
+		
+		//== 設定匯出資料格式 ==
+		$freference = ['volume'=>[],'element'=>[]];  // 資料匯出參考
+		$fformat = [];  // 欄位檢測 
+		
+		foreach($meta_currency as $sheet=>$data_export ){	
+		  
+		  // 取得 CLASS ZONGS
+		  $freference['volume']['zong'] = [];
+		  $DB_ZONG = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_INFO());
+		  $DB_ZONG->bindParam(':zclass', $sheet );	
+		  if( !$DB_ZONG->execute()){
+			throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');
+		  }
+		  while($tmp = $DB_ZONG->fetch(PDO::FETCH_ASSOC)){
+			$freference['volume']['zong'][$tmp['zid']] = $tmp['zname'];	
+		  }
+			
+		  // 取得全宗分類資料
+		  $freference['volume']['level'] = [];
+		  $zclass = [];
+		  $DB_CLASS = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_CLASS());
+		  $DB_CLASS->bindParam(':zclass', $sheet );	
+		  if( !$DB_CLASS->execute()){
+			throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');
+		  }
+		  $zclass =  $DB_CLASS->fetch(PDO::FETCH_ASSOC);
+			
+		  // 建構全宗分類
+		  $DB_ZLV = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_LEVEL());
+		  function builtzongclass($dblink,$bindno,$znamepre,$zlevel){
+			$dblink->bindParam(':mcno', $bindno );	
+			$dblink->execute();          
+			$lvs = $dblink->fetchAll(PDO::FETCH_ASSOC);
+			  
+			if(count($lvs)){
+			  foreach($lvs as $lv){
+				$zlevel[$lv['class_code']] = $znamepre.'/'.$lv['class_name'];	
+				$zlevel = $zlevel+builtzongclass($dblink,$lv['mcno'],$znamepre.'/'.$lv['class_name'],$zlevel);    
+			  }  
+			}
+			return  $zlevel; 
+		  }
+			
+		  if(isset($zclass['mcno'])){
+			$freference['volume']['level'] = builtzongclass($DB_ZLV,$zclass['mcno'],$zclass['class_name'],[]);	
+		  }
+		  
+		  // 設定資料集相關
+		  switch($sheet){
+		    case 'relic':		
+			  
+			  $excel_template = 'template_btm_source_metadata.xlsx'; 
+			  
+			  // 取得卷欄位檢測參考表  meta_format
+			  $DB_MTINFO = $this->DBLink->prepare( SQL_AdMeta::GET_DB_TABL_FORMAT());
+			  $DB_MTINFO->bindValue(':dbtable','source_digiarchvie');
+			  $DB_MTINFO->execute();
+			  while($field = $DB_MTINFO->fetch(PDO::FETCH_ASSOC)){
+				$fformat['volume'][$field['dbcolumn']] = $field;
+				if($field['module']=='S' && $field['pattern']){
+                  $freference['volume'][$field['dbcolumn']] = explode(';',$field['pattern']);   					
+				}
+			  }
+			  
+			  // 取得件欄位檢測參考表  meta_format 
+			  $DB_MTINFO = $this->DBLink->prepare( SQL_AdMeta::GET_DB_TABL_FORMAT());
+			  $DB_MTINFO->bindValue(':dbtable','source_digielement');
+			  $DB_MTINFO->execute();
+			  while($field = $DB_MTINFO->fetch(PDO::FETCH_ASSOC)){
+				$fformat['element'][$field['dbcolumn']] = $field;
+				if($field['module']=='S' && $field['pattern']){
+                  $freference['element'][$field['dbcolumn']] = explode(';',$field['pattern']);   					
+				}
+			  }
+			  
+			  break;
+		    
+			default:
+			  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+			  break;
+		  }
+		  
+		  
+		  //php excel initial
+		  $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+		  $objPHPExcel = $objReader->load(_SYSTEM_ROOT_PATH.'mvc/templates/'.$excel_template);
+		    
+          $ref_col = 0;
+		  $refer_colindex = [];
+		    		   
+		   
+		  //填入入資料
+		  foreach($data_export as $d_type => $data_list){
+			
+			// 設定 excel sheet  
+			$col = 0 ;
+			$row_start = 6 ;
+			$active_sheet = null;
+			
+			if($d_type == 'volume' ){  
+			  $active_sheet = $objPHPExcel->setActiveSheetIndex(0);
+		      $row_max   = $row_start+count($data_list);
+			}else{
+			  $active_sheet = $objPHPExcel->setActiveSheetIndex(1);	
+			}
+		    
+			//取得excel與DB欄位位置對應
+			$col = 0; $row=5;    // 系統預設excel格式，第4行為欄位ID
+			$dbf2colindex=['d2x'=>[],'x2d'=>[]];    // db欄位對應xls row 位置  
+			while($field = trim($active_sheet->getCellByColumnAndRow($col,$row))){
+			  $col_now = $col;
+			  $col++;
+			  if($field=='' || $col > 100 ) break;
+			  if(!isset($fformat[$d_type][$field])) continue;  
+			  $dbf2colindex['d2x'][$field] = $col_now;
+			  $dbf2colindex['x2d'][$col_now] = $field;
+			}
+			
+			// 填入內容
+			$row = $row_start;  
+			foreach( $data_list as $data){
+				$col = 0;
+				foreach($data as $f=>$v){
+				  if( $f=='class') continue;
+				  if(preg_match('/^_/',$f)) continue; 
+				  if(is_array($v)) $v = join(';',$v);
+				  if(!trim($active_sheet->getCellByColumnAndRow($col,5))) break;
+				  $active_sheet->getCellByColumnAndRow($dbf2colindex['d2x'][$f], $row)->setValueExplicit($v, PHPExcel_Cell_DataType::TYPE_STRING);  	
+				  $col++; 
+				}
+				$row++;
+			}
+			
+			// 設定顯示樣式
+		    foreach($dbf2colindex['d2x'] as $dbf => $xlscol){
+				$col_code  = colnum2code($xlscol);  
+				
+			    $cell_style = array();
+			    
+				// index
+				if(isset($fformat[$d_type][$dbf]['autonew']) && $fformat[$d_type][$dbf]['autonew']) continue;
+				
+				
+				// 必填
+				if(isset($fformat[$d_type][$dbf]['nessary']) && $fformat[$d_type][$dbf]['nessary'] ){
+					$cell_style['borders'] = array(
+								'allborders' => array(
+									'style' => PHPExcel_Style_Border::BORDER_THIN,
+									'color' => array('rgb' => '4682b4')
+								)
+							);		
+				}
+			    
+				// 系統生成
+				if(isset($fformat[$d_type][$dbf]['fromsys']) && $fformat[$d_type][$dbf]['fromsys'] ){
+					$cell_style['fill'] = array(
+								'type' => PHPExcel_Style_Fill::FILL_SOLID,
+								'color' => array('rgb' => 'eee8aa')
+							    );
+				}
+				
+				if(count($cell_style)){
+				  $active_sheet->getStyle($col_code.$row_start.':'.$col_code.($row_max+100))->applyFromArray($cell_style);	
+				}
+		    }// endof style set
+			
+			
+		    // 放入參考資料
+		    $reference_sheet = $objPHPExcel->setActiveSheetIndexByName('REFERENCE'); 
+			$refer = $freference[$d_type];
+			
+			foreach($refer as $rf => $rset){
+				$row = 3;
+				if($rf=='zong'){        // 特殊欄位參考
+				  $refer_colindex['zong'] = ['index'=>$ref_col,'set'=>array_keys($refer[$rf])];
+				  $refer_colindex['fonds'] = ['index'=>$ref_col+1,'set'=>array_values($refer[$rf])];
+				  $reference_sheet->getCellByColumnAndRow($refer_colindex['zong']['index'], 2)->setValueExplicit('zong', PHPExcel_Cell_DataType::TYPE_STRING);  
+				  $reference_sheet->getCellByColumnAndRow($refer_colindex['fonds']['index'], 2)->setValueExplicit('fonds', PHPExcel_Cell_DataType::TYPE_STRING);  
+				  foreach($rset as $rid => $rvalue){
+					$reference_sheet->getCellByColumnAndRow($refer_colindex['zong']['index'], $row)->setValueExplicit($rid, PHPExcel_Cell_DataType::TYPE_STRING);  
+					$reference_sheet->getCellByColumnAndRow($refer_colindex['fonds']['index'], $row)->setValueExplicit($rvalue, PHPExcel_Cell_DataType::TYPE_STRING);  
+					$row++;
+				  }
+				  $ref_col+=1;
+				}else if($rf=='level'){
+				  $refer_colindex['level'] = ['index'=>$ref_col,'set'=>array_keys($refer[$rf])];
+				  $refer_colindex['series'] = ['index'=>$ref_col+1,'set'=>array_values($refer[$rf])];
+				  $reference_sheet->getCellByColumnAndRow($refer_colindex['level']['index'], 2)->setValueExplicit('level', PHPExcel_Cell_DataType::TYPE_STRING);  
+				  $reference_sheet->getCellByColumnAndRow($refer_colindex['series']['index'], 2)->setValueExplicit('series', PHPExcel_Cell_DataType::TYPE_STRING);  
+				  foreach($rset as $rid => $rvalue){
+					$reference_sheet->getCellByColumnAndRow($refer_colindex['level']['index'], $row)->setValueExplicit($rid, PHPExcel_Cell_DataType::TYPE_STRING);  
+					$reference_sheet->getCellByColumnAndRow($refer_colindex['series']['index'], $row)->setValueExplicit($rvalue, PHPExcel_Cell_DataType::TYPE_STRING);  
+					$row++;
+				  }
+				  $ref_col+=1;
+				}else{  				// 普通欄位參考  			
+				  $refer_colindex[$rf] = ['index'=>$ref_col,'set'=>$rset];
+				  $reference_sheet->getCellByColumnAndRow($ref_col, 2)->setValueExplicit($rf, PHPExcel_Cell_DataType::TYPE_STRING);  
+				  foreach($rset as $rid => $rvalue){
+					$reference_sheet->getCellByColumnAndRow($ref_col, $row)->setValueExplicit($rvalue, PHPExcel_Cell_DataType::TYPE_STRING);  
+					$row++;
+				  }
+				}
+                $ref_col++;
+				
+			}// end of data insert
+			
+			
+			// 設定參考
+			// 設訂欄位參考選單與對應
+			foreach($dbf2colindex['d2x'] as $field => $data_col){
+				  
+				if(!isset($refer_colindex[$field])) continue;
+				  
+				$refer_col_code  = colnum2code($refer_colindex[$field]['index']);  // 參考欄位COL代號
+				  
+				$objValidation01 = $active_sheet->getCellByColumnAndRow($data_col,$row_start)->getDataValidation();
+				$objValidation01->setType( PHPExcel_Cell_DataValidation::TYPE_LIST );
+				$objValidation01->setErrorStyle( PHPExcel_Cell_DataValidation::STYLE_INFORMATION );
+				$objValidation01->setAllowBlank(false);
+				$objValidation01->setShowDropDown(true);
+				$objValidation01->setFormula1('REFERENCE!$'.$refer_col_code.'$3:$'.$refer_col_code.'$'.(3+count($refer_colindex[$field]['set'])));
+				
+				for($i=($row_start) ; $i<$row_max ; $i++){
+					$active_sheet->getCellByColumnAndRow($data_col,$i)->setDataValidation(clone $objValidation01);
+					if($field == 'fonds' || $field == 'series'){
+					  
+					  $col_main = colnum2code(($dbf2colindex['d2x'][$field]));	 		// 設定連動之欄位COL代號
+					  $col_rele = colnum2code(($dbf2colindex['d2x'][$field]-1));	 		// 設定連動之欄位COL代號
+					  $col_search_s = colnum2code(($refer_colindex[$field]['index']-1)); // 連動參考起始欄位 
+					  $col_search_e = colnum2code($refer_colindex[$field]['index']);     // 連動參考結束欄位
+					  
+					  $row_refer_s = 3;
+					  $row_refer_e = ($row_refer_s+count($refer_colindex[$field]['set']));
+					  
+					  // 正向連動 查A回B
+					  //$active_sheet->setCellValue($col_rele.$i,'=VLOOKUP('.$col_main.$i.',REFERENCE!'.$col_search_s.'3:'.$col_search_e.(3+count($refer_colindex[$field]['set'])).',1,FALSE)');
+					
+					  // 反向連動 查B回A
+					  $active_sheet->setCellValue($col_rele.$i,'=INDEX(REFERENCE!$'.$col_search_s.'$'.$row_refer_s.':$'.$col_search_s.'$'.$row_refer_e .',MATCH('.$col_main.$i.',REFERENCE!$'.$col_search_e.'$'.$row_refer_s.':$'.$col_search_e.'$'.$row_refer_e.',0))');
+					
+					}
+				}
+			}//end of active refernece  
+		  }
+		}
+		
+		// 設定序號
+		$objPHPExcel->setActiveSheetIndex(0);
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(1, 2)->setValueExplicit(date('Y-m-d H:i:s'), PHPExcel_Cell_DataType::TYPE_STRING);  	
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(1, 3)->setValueExplicit($export_key, PHPExcel_Cell_DataType::TYPE_STRING);  	
+		
+        $excel_file_name =  _SYSTEM_NAME_SHORT.'_renew_'.date('Ymd');
+		$objPHPExcel->setActiveSheetIndex(0);
+	    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+	    $objWriter->save(_SYSTEM_USER_PATH.$this->USER->UserID.'/'.$excel_file_name.'.xlsx'); 
+		unset($objPHPExcel);
+		
+		// final
+		$result['data']['fname']   = $excel_file_name;
+		$result['data']['count']   = $data_batch_counter;
+		
+		$result['action'] = true;
+		
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;  
+	}
+	
+	
+	//-- Admin Meta Export Upload Meta Fail Part // 取得上傳資料有錯誤部分
+	// [input] : UploadFile ;
+	public function ADMeta_Select_Batch_Detect($UploadFile){
+	  
+	  $result_key = parent::Initial_Result('batch');
+	  $result  = &$this->ModelResult[$result_key];
+	  
+	  function colnum2code($colnumber){ //COL欄位轉換
+		/*range A - ZZ */
+		$col_range = range('A','Z');
+		$col_index = intval($colnumber);
+		$col_code  = '';
+		if(intval($col_index/26)){
+		  $col_code = $col_range[intval($col_index/26)-1];
+		  $col_code .= ($col_index%26) ? $col_range[($col_index%26-1)]:'A'; 
+		}else{
+		  $col_code	= $col_range[$col_index];
+		}
+		return $col_code;
+	  }
+	  
+	  try{
+	    
+		$upload_folder = _SYSTEM_DIGITAL_FILE_PATH.'UPLOAD/'.$this->USER->UserID.'/';
+		
+		if(!file_exists($upload_folder.$UploadFile)){
+		  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+		}
+		
+		$objReader = PHPExcel_IOFactory::createReaderForFile($upload_folder.$UploadFile);
+	    $objPHPExcel = $objReader->load($upload_folder.$UploadFile);
+		$main_sheet = $objPHPExcel->setActiveSheetIndex(0);
+	    
+		
+		//取得處理參數
+		$meta_class   = $main_sheet->getCellByColumnAndRow(1,1)->getValue();
+		$meta_version = $main_sheet->getCellByColumnAndRow(1,2)->getValue();
+		$meta_key     = $main_sheet->getCellByColumnAndRow(1,3)->getValue(); 
+	    
+		$frow_start   = 5;
+		
+		// 設定資料集相關
+		$fformat = [0=>[],1=>[]];
+		switch($meta_class){
+		    case 'relic':		
+			  // 取得卷欄位檢測參考表  meta_format
+			  $DB_MTINFO = $this->DBLink->prepare( SQL_AdMeta::GET_DB_TABL_FORMAT());
+			  $DB_MTINFO->bindValue(':dbtable','source_digiarchive');
+			  $DB_MTINFO->execute();
+			  while($field = $DB_MTINFO->fetch(PDO::FETCH_ASSOC)){
+				$fformat[0][$field['dbcolumn']] = $field;
+				if($field['module']=='S' && $field['pattern']){
+                  $freference[0][$field['dbcolumn']] = explode(';',$field['pattern']);   					
+				}
+			  }
+			  
+			  // 取得件欄位檢測參考表  meta_format 
+			  $DB_MTINFO = $this->DBLink->prepare( SQL_AdMeta::GET_DB_TABL_FORMAT());
+			  $DB_MTINFO->bindValue(':dbtable','source_digielement');
+			  $DB_MTINFO->execute();
+			  while($field = $DB_MTINFO->fetch(PDO::FETCH_ASSOC)){
+				$fformat[1][$field['dbcolumn']] = $field;
+				if($field['module']=='S' && $field['pattern']){
+                  $freference[1][$field['dbcolumn']] = explode(';',$field['pattern']);   					
+				}
+			  }
+			  
+			  break;
+		    
+			 
+			
+			default:
+			  throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
+			  break;
+		}
+		
+		// 取得全宗分類資料
+		$freference[0]['level'] = [];
+		$zclass = [];
+		$DB_CLASS = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_CLASS());
+		$DB_CLASS->bindParam(':zclass', $meta_class );	
+		if( !$DB_CLASS->execute()){
+			throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');
+		}
+		$zclass =  $DB_CLASS->fetch(PDO::FETCH_ASSOC);
+			
+		// 建構全宗分類
+		$DB_ZLV = $this->DBLink->prepare( SQL_AdMeta::GET_ZONG_LEVEL());
+		function builtzongclass($dblink,$bindno,$znamepre,$zlevel){
+			$dblink->bindParam(':mcno', $bindno );	
+			$dblink->execute();          
+			$lvs = $dblink->fetchAll(PDO::FETCH_ASSOC);
+			  
+			if(count($lvs)){
+			  foreach($lvs as $lv){
+				$zlevel[$lv['class_code']] = $znamepre.'/'.$lv['class_name'];	
+				$zlevel = $zlevel+builtzongclass($dblink,$lv['mcno'],$znamepre.'/'.$lv['class_name'],$zlevel);    
+			  }  
+			}
+			return  $zlevel; 
+		}
+			
+		if(isset($zclass['mcno'])){
+			$class_level = builtzongclass($DB_ZLV,$zclass['mcno'],$zclass['class_name'],[]);
+			if(is_array($class_level)&&count($class_level)){
+			  $freference[0]['level'] = array_keys($class_level);	
+			  $freference[0]['series'] = array_values($class_level);	
+			}
+		}
+		  
+		
+		
+		//取得當前資料版本 - by匯出key
+		$meta_currency = [];
+		
+		$DB_MTNOW = $this->DBLink->prepare( SQL_AdMeta::GET_EXPORT_CURRENT_META());
+	    $DB_MTNOW->bindValue(':key',$meta_key);
+	    $DB_MTNOW->execute();
+	    while($tmp = $DB_MTNOW->fetch(PDO::FETCH_ASSOC)){
+		  if(!isset($meta_currency[$tmp['class']])) $meta_currency[$tmp['class']]=['volume'=>[],'element'=>[]];
+		  $source = json_decode($tmp['source_json'],true);
+	      if($tmp['data_type']=='collection'){
+			$meta_currency[$tmp['class']]['volume'][$tmp['applyindex']] = $source['collection'];
+		  }else{
+			$meta_currency[$tmp['class']]['element'][$tmp['applyindex']] = $source['element'];  
+		  }
+		}
+		
+		
+		//取得匯出當時的資料狀態
+		$meta_whenexport = [];
+		$export_store = _SYSTEM_DIGITAL_FILE_PATH.'METADATA/export/'.$meta_key.'.json';
+		if(file_exists($export_store)){
+		  $meta_whenexport = json_decode(file_get_contents($export_store),true);	
+		}
+		
+		
+		//掃描excel檔案
+		$sheet_count = $objPHPExcel->getSheetCount();
+		$sheet_check = [
+		  'insert'=>[],
+		  'delete'=>[],
+		  'conflict'=>[],
+		  'modify'=>[],
+		  'fail'=>[],
+		  'total'=>0
+		];
+		
+		$sheet_type_map = [0=>'volume',1=>'element']; 
+		
+		for($shindex=0;$shindex<2;$shindex++){
+		  
+		  $meta_sheet = $objPHPExcel->setActiveSheetIndex($shindex);
+		  $meta_sheet_name = $objPHPExcel->getActiveSheet()->getTitle();  
+		  
+		  // get meta field
+		  $col = 0;
+		  $meta_fileds   = [];
+		  $meta_col2field = [];
+		  
+		  $fcounter = 0;
+		  while( $f = trim($meta_sheet->getCellByColumnAndRow($col,$frow_start)->getValue())){
+            
+			$meta_fileds[$f]=[
+		      'index'	=> $col,
+			  'field'	=> $f,
+			  'name'	=> trim($meta_sheet->getCellByColumnAndRow($col,($frow_start-1))->getValue()),
+		      'format'	=> (isset($fformat[$shindex][$f]) ? $fformat[$shindex][$f] : []),
+			  'refer' 	=> (isset($freference[$shindex][$f]) ? $freference[$shindex][$f] : [])
+		    ];
+			$meta_col2field[$col] = $f;
+			$col++;
+		    if($fcounter++ > 100 ) break; // 防止迴圈
+		  }
+		  
+		  // get meta sheet
+		  $mcol_start   = 0;
+		  $mrow_start   = 6;
+		  $mcol_finish  = count($meta_fileds);
+		  
+		  $frow = $mrow_start; 
+		  $read_exit_fleg = 0;
+		  $meta_records = [];
+		  $meta_rremove = [];  //存放不須保存的資料行
+		  
+		  do{
+			
+			$meta_xlsread = [];  //從excel中讀取之資料
+			$meta_linkfld = '';  //跨資料版本之索引號碼 
+			
+			for($fcol=$mcol_start ; $fcol<$mcol_finish ; $fcol++ ){
+			  $cell = trim($meta_sheet->getCellByColumnAndRow($fcol,$frow)->getValue());  
+		      if(substr($cell,0,1)=='='){
+				$cell = trim($meta_sheet->getCellByColumnAndRow($fcol,$frow)->getFormattedValue());
+			  }
+			  $meta_xlsread[$meta_col2field[$fcol]] = $cell;
+			  if($meta_col2field[$fcol] == $this->SourceTableIndexFild){
+				$meta_linkfld = $cell; 
+			  }
+			} 
+		    
+			if(!count(array_filter($meta_xlsread))){  // 若為空值
+				$read_exit_fleg++;
+			}else{
+				
+				
+				// 取得其他參照版本
+				$meta_db_record = isset($meta_currency[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld]) ? $meta_currency[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld] :[];
+				$meta_ep_record = isset($meta_whenexport[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld]) ? $meta_whenexport[$meta_class][$sheet_type_map[$shindex]][$meta_linkfld] :[];
+				
+				
+				//檢測資料
+				$error_detect = 0;
+				
+				foreach($meta_xlsread as $mf => $mv){  
+				  
+				  if(!isset($meta_fileds[$mf])) continue;
+				  
+				  $format_pass = true;  
+				  $notconflict = true;  
+				  
+				  $cellid  = [colnum2code($meta_fileds[$mf]['index']),$frow];
+				  $checker = isset($meta_fileds[$mf]['format']) ? $meta_fileds[$mf]['format'] : [];
+				  	
+				  //check if auto new
+				  if($checker['autonew']){
+					if($mv=='+'){
+					  $sheet_check['insert'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => '第 '.$frow.' 行',  //colnum2code($meta_fileds[$mf]['index']).':'.$frow
+						'descrip' => join(', ',array_values($meta_xlsread)),
+					  ];  
+					}else if($mv=='-'){
+					  $sheet_check['delete'][] = [
+					    'cellid'  => '第 '.$frow.' 行',  //colnum2code($meta_fileds[$mf]['index']).':'.$frow
+					  ];    
+					}
+			      }
+				  
+				  //check if empty
+				  if($checker['nessary'] && $mv=='' ){
+					$sheet_check['fail'][] = [
+					  'sheet'   => $meta_sheet_name,
+					  'cellid'  => join(':',$cellid),
+					  'column'  => $meta_fileds[$mf]['name'],
+					  'content' => '',
+					  'descrip' => '此欄位不可為空',
+					];
+					$format_pass = false;
+					$error_detect++;
+				  
+				  }else if($checker['fromsys'] && isset($freference[$shindex][$mf])){
+					//check from system
+					$valrefer = $freference[$shindex][$mf];  
+					if(!in_array($mv,$valrefer)){
+					  $sheet_check['fail'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $mv,
+					    'descrip' => '資料不合法，請使用系統設定值',
+					  ];
+					  $format_pass = false;
+					  $error_detect++;
+					}  
+			      }else{
+					
+					switch($checker['module']){
+						case 'R': if(!preg_match( $checker['pattern'] ,$mv)){ $format_pass=false; } break;
+						case 'V': if( $checker['pattern']!=$mv){ $format_pass=false;} break;
+						case 'S':	if( $mv!='' && !in_array($mv,explode(';',$checker['pattern']))){ $format_pass=false; } break;				  
+						default: break;	
+					}
+					if(!$format_pass){
+					  $sheet_check['fail'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $mv,
+					    'descrip' => '格式錯誤'.($checker['descrip'] ? ' : '.$checker['descrip'] : ''),
+					  ];
+					  $error_detect++;
+					}
+				  }
+				  
+				  // 檢視是否碰撞  目前資料版本已與匯出時不同
+				  if(isset($meta_db_record[$mf]) && isset($meta_ep_record[$mf]) && $meta_db_record[$mf] != $meta_ep_record[$mf]){
+					$sheet_check['conflict'][] = [
+					    'sheet'   => $meta_sheet_name,
+						'cellid'  => join(':',$cellid),
+					    'column'  => $meta_fileds[$mf]['name'],
+					    'content' => $meta_db_record[$mf],
+					    'descrip' => '資料已變更 : '.$meta_db_record['_timeupdate'].'由'.$meta_db_record['_userupdate'].'修改',
+					];
+					$notconflict = false;
+				    $error_detect++;
+				  }
+				  
+				  
+				  //錯誤標示於excel
+			      $cell_style['fill'] = array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => 'ff4500')
+				  );
+			      if(!$format_pass){
+					$meta_sheet->getStyle(join('',$cellid).':'.join('',$cellid))->applyFromArray($cell_style);	  
+				  }
+				  
+				  //衝突標示excel
+			      $cell_style['fill'] = array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => '888888')
+				  );
+			      if(!$notconflict){
+					$meta_sheet->getStyle(join('',$cellid).':'.join('',$cellid))->applyFromArray($cell_style);	  
+				  }
+				}
+				
+				if($error_detect===0){
+				  $meta_rremove[] = $frow;
+				}
+				
+				$sheet_check['total']++;
+			}
+			$frow++;
+			
+			
+			
+		  }while($read_exit_fleg < 10);
+		  
+		  // 移除excel 列
+		  if(count($meta_rremove)){
+			while($del_row = array_pop($meta_rremove)){
+			  $meta_sheet->removeRow($del_row,1);  	
+			}			
+		  }
+		  
+		}
+		
+		$excel_file_name = preg_replace('/(\.xls)/','-E\\1',$UploadFile);
+		$objPHPExcel->setActiveSheetIndex(0);
+	    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+	    $objWriter->save($upload_folder.$excel_file_name); 
+		unset($objPHPExcel);
+		
+		// final
+		$result['action'] = true;
+		$result['data']   = $excel_file_name;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	//-- Admin Meta Hide/Show Image
 	// [input] : DataNo  :  \d+;
