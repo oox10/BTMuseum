@@ -1011,7 +1011,7 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	
 
 	//-- execute task : 編輯資料 
-	$('.act_meta_getin').click(function(){
+	$(document).on('click','.act_meta_getin',function(){
 	  var task_dom = $(this).parents('.data_record');
 	  var data_no  = task_dom.attr('no');
 	  
