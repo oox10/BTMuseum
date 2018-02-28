@@ -9,6 +9,10 @@ div.system_message_area{top:45%;}
 #meta_field_store_no_set{ flex:1; margin-right:10px;}
 #meta_field_store_no_value{ flex:0 0 150px; }
 
+#meta_field_title{ flex: 1; margin-right:10px;}
+#meta_field_store_orl{ flex: 0 0 150px; }
+
+
 
 #META-V-store_year{flex:0 0 70px;  }	
 #META-V-store_type{flex:0 0 30px;  }	
@@ -16,6 +20,10 @@ div.system_message_area{top:45%;}
 #META-V-store_no2{flex:0 0 80px;  }	
 #META-V-store_no3{flex:0 0 30px;  }
 #META-V-store_id{flex:1; text-align:center;}
+
+
+
+
 
 select._ethnic_main{flex:0 0 40%;}
 ul.ethnic_assist > li{

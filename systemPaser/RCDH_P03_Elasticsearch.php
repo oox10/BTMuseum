@@ -110,6 +110,10 @@
                         'type' => 'keyword',
 						'index' => true,
 					],
+					'store_orl'=> [
+                        'type' => 'keyword',
+						'index' => true,
+					],
 					'date_string' => [
                         'type' => 'text',
 						"fielddata"=>true,
@@ -123,7 +127,6 @@
                         'type' => 'date',
 						//'index' => 'not_analyzed'
                     ],
-					
 					
 				    'title' => [
                         'type' => 'text',

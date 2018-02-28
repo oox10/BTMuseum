@@ -183,7 +183,7 @@
 						  <div class='data_col ' id='meta_field_store_no_value'> 
 						    <label class='data_field _must' > 典藏號 </label>
 						    <div class='data_value _must _bundle' >   
-							  <input type='text' class='_volume _variable _update_must' id='META-V-store_id' default='' readonly=true value='<?php echo $meta_collect['META-V-store_id'];?>' />
+							  <input type='text' class='_volume _variable _update _must' id='META-V-store_id' default='' readonly=true value='<?php echo $meta_collect['META-V-store_id'];?>' />
 						    </div>
 						  </div>
 						  
@@ -220,11 +220,19 @@
 					
 				    <div class='search_meta' > <!-- 資料欄位 -->
 					  
-					  <div class='data_col' id='' > 
-					    <label class='data_field _must'>名稱</label>
-					    <div class='data_value'>   
-					      <input type='text'  class='_volume _variable _update _must' name="META-V-title" id='META-V-title'  placeholder='名稱' value='<?php echo $meta_collect['META-V-title']; ?>'  />
-						</div>
+					  <div class='field_set'>  
+						  <div class='data_col' id='meta_field_title' > 
+							<label class='data_field _must'>品名</label>
+							<div class='data_value'>   
+							  <input type='text'  class='_volume _variable _update _must' name="META-V-title" id='META-V-title'  placeholder='名稱' value='<?php echo $meta_collect['META-V-title']; ?>'  />
+							</div>
+						  </div>
+						  <div class='data_col ' id='meta_field_store_orl'> 
+						    <label class='data_field' > 原編號 </label>
+						    <div class='data_value' >   
+							  <input type='text' class='_volume _variable' id='META-V-store_orl' default='' readonly=true value='<?php echo $meta_collect['META-V-store_orl'];?>' />
+						    </div>
+						  </div>
 					  </div>
 					  
 					  <div class='field_set'> 

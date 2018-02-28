@@ -31,7 +31,10 @@
 	<?php
 	$user_info 		= isset($this->vars['server']['data']['user']) 		? $this->vars['server']['data']['user'] 	: array('user'=>array('user_name'=>'Anonymous'),'group'=>array());
 	
-	$data_filter    = isset($this->vars['server']['data']['filter']['submit']) 	? $this->vars['server']['data']['filter']['submit'] : array('search'=> [],'data_type'=>'collection','logout'=>0 );  
+	$zong_info 		= isset($this->vars['server']['data']['zongs']) 		? $this->vars['server']['data']['zongs'] 	: array();
+	
+	
+	$data_filter    = isset($this->vars['server']['data']['filter']['submit']) 	? $this->vars['server']['data']['filter']['submit'] : array('search'=> [],'data_zong'=>array_keys($zong_info),'data_type'=>'collection','logout'=>0 );  
 	$data_termhit   = isset($this->vars['server']['data']['filter']['termhit']) 	? $this->vars['server']['data']['filter']['termhit'] : array();  
 	
 	$data_list  	= isset($this->vars['server']['data']['search']['list']) 	? $this->vars['server']['data']['search']['list'] : array();  
@@ -39,8 +42,7 @@
 	$data_count 	= isset($this->vars['server']['data']['search']['count']) 	? $this->vars['server']['data']['search']['count'] : 0;  
 	$data_pageing 	= isset($this->vars['server']['data']['search']['range'])    ? $this->vars['server']['data']['search']['range'] : '1-50';
 	$data_start 	= isset($this->vars['server']['data']['search']['start'])    ? $this->vars['server']['data']['search']['start'] : 1;
-	
-	
+	 
 	$data_pterm 	= isset($this->vars['server']['data']['search']['pterm'])    ? $this->vars['server']['data']['search']['pterm'] : [];
 	// 後分類欄位設定
 	$post_query_fields = [
@@ -181,14 +183,24 @@
 				</span>
 			</div>
 			<ul class='filter_set'>
+			  
+			  
+			  <li>
+			    <label id=''>全宗篩選：</label>
+				<?php foreach($zong_info as $zong):?>
+				<input type='checkbox' class='zselect' name='data_zong' value='<?php echo $zong['zid'];?>'	<?php echo in_array($zong['zid'],$data_filter['data_zong']) ? 'checked':''?> /> <span class='zname'><?php echo $zong['zname'];?></span>
+				<?php endforeach; ?>
+			  
+			  </li>
+			  
 			  <li>
 			    <label id=''>層級篩選：</label>
-				<input type='radio' class='typesel' name='data_type' value='collection'	<?php echo $data_filter['data_type']=='collection' ? 'checked':''?> /> <span class='zname'>文物</span>
-				<input type='radio' class='typesel' name='data_type' value='element'	<?php echo $data_filter['data_type']=='element' ? 'checked':''?> /> <span class='zname'>影像</span>
+				<input type='radio' class='typesel' name='data_type' value='collection'	<?php echo $data_filter['data_type']=='collection' ? 'checked':''?> /> <span class=''>文物</span>
+				<input type='radio' class='typesel' name='data_type' value='element'	<?php echo $data_filter['data_type']=='element' ? 'checked':''?> /> <span class=''>影像</span>
 			  </li>
 			  <li>
 			    <label id=''>註銷篩選：</label>
-				<input type='checkbox' class='logoutsel' name='logout_flag' value='1'	<?php echo $data_filter['logout']=='1' ? 'checked':''?> /> <span class='zname'>已註銷文物</span>
+				<input type='checkbox' class='logoutsel' name='logout_flag' value='1'	<?php echo $data_filter['logout']=='1' ? 'checked':''?> /> <span class=''>已註銷文物</span>
 			  </li>
 			  <!--
 			  <li>

@@ -67,6 +67,12 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 		search['search'].push(condition);
 	  });
 	  
+	  // 篩選全宗
+	  if($('.zselect').length){
+		search['data_zong'] = $("input[name='data_zong']:checked").map(function(){return $(this).val()}).get();   	 
+	  }
+	  
+	  
 	  // 勾選搜尋層級
 	  if($('.typesel').length){
 		if($('.typesel')[0].tagName=='INPUT'){

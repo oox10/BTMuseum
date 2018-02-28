@@ -74,6 +74,9 @@
 			  'identifier' 		=>'',   //
 			  'applyindex' 		=>'',   //
 			  
+			  'store_orl' 		=>'',   //
+			  
+			  
 			  'date_string'		=>'',   // 日期描述
 			  'date_start'		=>'',   // 日期起 for search
 			  'date_end'		=>'',   // 日期迄 for search
@@ -147,6 +150,8 @@
 				if($meta['data_type']=='collection'){
 					
 					
+					$search_conf['store_orl']    = $source['collection']['store_orl'];
+				
 					// 確認日期
 					$search_conf['date_string'] = '民國'.$source['collection']['store_year'].'年入館';
 					

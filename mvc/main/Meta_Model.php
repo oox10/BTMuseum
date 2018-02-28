@@ -19,9 +19,81 @@
 	
 	/*[ Meta Function Set ]*/ 
     
+	
+	
+	//-- Admin Meta Get source db table 
+	// [input] : NONE
+    public function ADMeta_Get_Zong_List(){
+		
+	  $result_key = parent::Initial_Result('zongs');
+	  $result  = &$this->ModelResult[$result_key];
+	  try{  
+		
+		// 取得全宗資訊
+		$zongs = [];
+		$DB_GET= $this->DBLink->prepare(SQL_AdMeta::GET_ZONG_LIST());
+		if($DB_GET->execute()){
+		  while($tmp = $DB_GET->fetch(PDO::FETCH_ASSOC)){
+			$zongs[$tmp['zid']] = $tmp;    
+		  }
+		}
+		
+		$result['data']   = $zongs;
+		$result['action'] = true;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;  
+	}
+	
+	
+	
+	//-- Admin Meta Get source db table 
+	// [input] : NONE
+    public function ADMeta_Get_Table_Fields(){
+		
+	  $result_key = parent::Initial_Result('dbfield');
+	  $result  = &$this->ModelResult[$result_key];
+	  try{  
+		
+		$fields_config = ['volume'=>[],'element'=>[]];
+		
+		// 取得資料表欄位資訊
+		$DB_GET= $this->DBLink->prepare(SQL_AdMeta::GET_TABLE_FORMAT());
+		
+		// get source_digiarchive
+		$DB_GET->bindValue(':dbtable'    , 'source_digiarchive');
+		if($DB_GET->execute()){
+		  while($field = $DB_GET->fetch(PDO::FETCH_ASSOC)){
+			$fields_config['volume'][$field['dbcolumn']] = $field;
+		  }
+		}
+		
+		// get source_digielement
+		$DB_GET->bindValue(':dbtable'    , 'source_digielement');
+		if($DB_GET->execute()){
+		  while($field = $DB_GET->fetch(PDO::FETCH_ASSOC)){
+			$fields_config['element'][$field['dbcolumn']] = $field;
+		  }
+		}
+		
+		$result['data']   = $fields_config;
+		$result['action'] = true;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result;  
+	}
+	
+	
+	
+	
+	
+	
 	//-- Admin Meta Process Search Filter 
 	// [input] : $SearchConfig => 搜尋設定  (string)base64_decode();
-	
 	public function ADMeta_Process_Filter($SearchConfig=''){
 	  
 	  $result_key = parent::Initial_Result('filter');
@@ -118,9 +190,15 @@
 		  }
 		  */
 		}
+		
+		if(isset($data_search['data_zong'])&&count($data_search['data_zong'])){
+		  $term_query[] = 'zong:('.join(' ',$data_search['data_zong']).')';	
+		}
+		
 		if(isset($data_search['logout'])&&$data_search['logout']){
 		  $term_query[] = 'logout_flag:1';	
 		}
+		
 		$type_query = $data_search['data_type']=='element' ? 'data_type:element':'data_type:collection';
 		
 		
@@ -604,43 +682,7 @@
 	}
 	
 	
-	//-- Admin Meta Get source db table 
-	// [input] : NONE
-    public function ADMeta_Get_Table_Fields(){
-		
-	  $result_key = parent::Initial_Result('dbfield');
-	  $result  = &$this->ModelResult[$result_key];
-	  try{  
-		
-		$fields_config = ['volume'=>[],'element'=>[]];
-		
-		// 取得資料表欄位資訊
-		$DB_GET= $this->DBLink->prepare(SQL_AdMeta::GET_TABLE_FORMAT());
-		
-		// get source_digiarchive
-		$DB_GET->bindValue(':dbtable'    , 'source_digiarchive');
-		if($DB_GET->execute()){
-		  while($field = $DB_GET->fetch(PDO::FETCH_ASSOC)){
-			$fields_config['volume'][$field['dbcolumn']] = $field;
-		  }
-		}
-		
-		// get source_digielement
-		$DB_GET->bindValue(':dbtable'    , 'source_digielement');
-		if($DB_GET->execute()){
-		  while($field = $DB_GET->fetch(PDO::FETCH_ASSOC)){
-			$fields_config['element'][$field['dbcolumn']] = $field;
-		  }
-		}
-		
-		$result['data']   = $fields_config;
-		$result['action'] = true;
-		
-	  } catch (Exception $e) {
-        $result['message'][] = $e->getMessage();
-      }
-	  return $result;  
-	}
+	
 	
 	
 	//-- Admin Meta Execute User Select Batch
@@ -2950,6 +2992,8 @@
 				if($meta['data_type']=='collection'){
 					
 					// 確認日期
+					$search_conf['store_orl']   = $source_array['collection']['store_orl'];
+					
 					$search_conf['date_string'] = '民國'.$source_array['collection']['store_no1'].'年入館';
 					
 					$meta_date[] = $source_array['collection']['store_date'];

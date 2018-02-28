@@ -20,7 +20,7 @@
    
 	$file_allow = array('jpg','png','tiff','wmv','mp4','mp3');
 	
-	define('_SOURCE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/20180120/');
+	define('_SOURCE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/20180222/');
 	define('_STORE_LOCATION',_SYSTEM_DIGITAL_FILE_PATH);
 	define('_SOURCE_UNPASER',_SYSTEM_DIGITAL_FILE_PATH.'ORIGINAL/unpaser/');
 	 
@@ -109,7 +109,7 @@
 		if(file_exists($store_location.'/profile/'.$bookmeta['store_no'].'.conf')){
 		  $store_profile = json_decode(file_get_contents($store_location.'/profile/'.$bookmeta['store_no'].'.conf'),true);	
 		}else{
-		  $store_profile = array('store'=>$store_location.'/browse/'.$bookmeta['store_no'].'/',"saved"=>date('Y-m-d H:i:s'),"items"=>[]."dotype"=['文物卡','整理照','出版照','相片','底片','翻拍','其他']);  
+		  $store_profile = array('store'=>$store_location.'/browse/'.$bookmeta['store_no'].'/',"saved"=>date('Y-m-d H:i:s'),"items"=>[],"dotype"=>['文物卡','整理照','出版照','相片','底片','翻拍','其他']);  
 		}
 		
 		

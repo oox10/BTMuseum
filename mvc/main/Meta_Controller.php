@@ -39,6 +39,7 @@
 	  $this->Model->ADMeta_Get_Page_List(5);
 	  $this->Model->ADMeta_Get_Table_Fields(); // 取得欄位設定
 	  $this->Model->ADMeta_Get_Folder_List();  // 設定工作資料夾
+	  $this->Model->ADMeta_Get_Zong_List();  // 設定工作資料夾
 	  self::data_output('html','admin_meta',$this->Model->ModelResult);
 	}
 	

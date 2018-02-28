@@ -14,6 +14,14 @@
 	
 	/***-- Admin Meta SQL --***/  
 	
+	
+	//-- Admin Meta :  get zong data
+	public static function GET_ZONG_LIST( ){
+	  $SQL_String = "SELECT * FROM meta_zong WHERE _view = 1 ORDER BY zorder ASC,zid ASC";
+	  return $SQL_String;
+	}
+	
+	
 	//-- Admin Meta :  get zong information
 	public static function GET_ZONG_INFO( ){
 	  $SQL_String = "SELECT * FROM meta_zong WHERE zclass=:zclass ORDER BY zorder ASC";

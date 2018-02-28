@@ -1,0 +1,1 @@
+2018-02-08 00:46:44 [ELASTIC]{"found":false,"_index":"btmu","_type":"search","_id":"4852","_version":1,"result":"not_found","_shards":{"total":2,"successful":1,"failed":0}}. 
