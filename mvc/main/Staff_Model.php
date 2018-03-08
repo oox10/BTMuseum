@@ -364,7 +364,7 @@
 		
 		foreach($staff_modify as $mf => $mv){
 		  
-		  if($mf == 'main_group'){
+		  if( $mf == 'main_group' ){
             
 			if($mv != $user['gid']){
 				// 移除使用者目前群組

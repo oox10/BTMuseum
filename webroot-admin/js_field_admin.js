@@ -33,6 +33,7 @@
 		success: 	function(response) {
 		  if(response.action){
 			system_message_alert('alert',"欄位設定已更新");
+			location.reload();
 		  }else{
 			system_message_alert('',response.info);
 		  }

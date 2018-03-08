@@ -67,6 +67,44 @@
 		  throw new Exception('_SYSTEM_ERROR_DB_RESULT_NULL');	
 		}
 		
+		
+		
+		
+		if(($meta_format['module']=='S' || $meta_format['module']=='E') && $meta_format['pattern']!=$data_format['pattern']){
+          // 更新source資料表
+		  $field_value_setad = array_filter(explode(';',$data_format['pattern']));
+		  $field_value_module= $meta_format['module']=='S' ? 'set' : 'enum';
+		  
+		  foreach($field_value_setad as $i=>$term){
+			
+			// 替換
+            if(count(explode('=>',$term)) > 1){
+			  $field_value_set_temp = $field_value_setad;	
+			  list($to,$tm) = explode('=>',$term);
+			  $field_value_set_temp[] = $to;
+			  $field_value_set_temp[] = $tm;
+              
+			  //擴充
+              $DB_EXP = $this->DBLink->prepare( SQL_AdMeta::SET_DBTABLE_SETFIELD($meta_format['dbtable'],$meta_format['dbcolumn'],$field_value_module,$field_value_set_temp));	
+		      $DB_EXP->execute();
+			  
+			  //變更資料
+			  $DB_UPDB = $this->DBLink->prepare( "UPDATE ".$meta_format['dbtable']." SET ".$meta_format['dbcolumn']."=REPLACE(".$meta_format['dbcolumn'].",'".$to."','".$tm."') WHERE ".$meta_format['dbcolumn']." LIKE '%".$to."%';");	
+		      $DB_UPDB->execute(); 
+			  
+			  $field_value_setad[$i]=$tm;
+			  
+			  $data_format['pattern'] = join(';',$field_value_setad);
+			  
+			}
+		  }
+		  
+		  $DB_UPDB = $this->DBLink->prepare( SQL_AdMeta::SET_DBTABLE_SETFIELD($meta_format['dbtable'],$meta_format['dbcolumn'],$field_value_module,$field_value_setad));	
+		  $DB_UPDB->execute();
+		}
+		
+		
+		
 		$DB_SAVE	= $this->DBLink->prepare(SQL_AdField::UPDATE_META_FORMAT());
 		$DB_SAVE->bindValue(':mfno' , $DataNo);
 		$DB_SAVE->bindValue(':can_export' , $data_format['can_export']);
@@ -78,13 +116,7 @@
 		  throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');
 		}
 	    
-		if(($meta_format['module']=='S' || $meta_format['module']=='E') && $meta_format['pattern']!=$data_format['pattern']){
-          // 更新source資料表
-		  $field_value_setad = array_filter(explode(';',$data_format['pattern']));
-		  $field_value_module= $meta_format['module']=='S' ? 'set' : 'enum';
-		  $DB_UPDB = $this->DBLink->prepare( SQL_AdMeta::SET_DBTABLE_SETFIELD($meta_format['dbtable'],$meta_format['dbcolumn'],$field_value_module,$field_value_setad));	
-		  $DB_UPDB->execute();
-		}
+		
 		 
 		// final 
 		$result['data'] = $DataNo;
