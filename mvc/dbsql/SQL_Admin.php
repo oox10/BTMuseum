@@ -38,9 +38,17 @@
 	}
 	
 	
+	// 查詢系統總數
+	public static function SELECT_ARCHIVE_ZONG_COUNT(){
+	  $SQL_String = "SELECT EXTRACT(YEAR_MONTH FROM _timeupdate) AS stage,sum(count_dofiles) as total_size,count(*) AS count ,fonds FROM source_digiarchive WHERE 1 GROUP BY fonds ORDER BY count DESC;";
+	  return $SQL_String;
+	}
+	
+	
+	
 	/***-- System Module Config Sqls --***/
 	
-	// 查詢系統總資料空間
+	// 
 	public static function UPDATE_MODULE_CONFIG(){
 	  $SQL_String = "UPDATE system_config SET setting=:setting,_update_user=:user WHERE module=:module AND field=:field AND _keep=1;";
 	  return $SQL_String;

@@ -151,7 +151,7 @@
                     enabled: true,
                     distance: 10,
 					formatter: function () {
-					  return  this.key + ':' + this.y + '%' ;
+					  return  this.key + ':' + this.y + '筆' ;
                     }
                 },
                 startAngle: -90,
@@ -160,7 +160,7 @@
             }
         },
         series: [{
-			name: '空間比例',
+			name: '資料比例',
             type: 'pie',
             innerSize: '30%',
             data: chart.pie_data

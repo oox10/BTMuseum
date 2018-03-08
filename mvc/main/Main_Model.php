@@ -101,12 +101,22 @@
 		
 		
 		// 圓餅圖資料
+	    
+		$DB_OBJ = $this->DBLink->prepare(SQL_Admin::SELECT_ARCHIVE_ZONG_COUNT());
+		if(!$DB_OBJ->execute()){
+		  throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');  
+		}
+		
+		while($zong = $DB_OBJ->fetch(PDO::FETCH_ASSOC)){
+		  $pi_data[] = array($zong['fonds'],$zong['count']); 	
+		}
+		/*
 		$pi_data = array();
 		foreach($x_rate as $name=>$total_size){
 		  $rate =  round($total_size/$system_used_space*100,2);
 		  $pi_data[] = array($name,$rate);
 		}
-		
+		*/
 		
 		
 		
