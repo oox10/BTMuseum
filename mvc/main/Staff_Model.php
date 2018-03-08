@@ -364,20 +364,22 @@
 		
 		foreach($staff_modify as $mf => $mv){
 		  
-		  if($mf == 'main_group' && $mv != $user['gid']){
-            // 移除使用者目前群組
-            $DB_DEL = $this->DBLink->prepare(SQL_AdStaff::DELETE_USER_MAIN_GROUP());
-			$DB_DEL->execute(array('uid'=>$user['uid']));
-			
-			// 加入新主要群組
-			$DB_INS = $this->DBLink->prepare(SQL_AdStaff::INSERT_USER_MAIN_GROUP());
-			$DB_INS->bindvalue(':uid',$user['uid'] );
-			$DB_INS->bindvalue(':gid',$mv);
-			$DB_INS->bindvalue(':creater',$this->USER->UserID);
-			$DB_INS->execute();
-			
-			$user['gid'] = $mv;
-			
+		  if($mf == 'main_group'){
+            
+			if($mv != $user['gid']){
+				// 移除使用者目前群組
+				$DB_DEL = $this->DBLink->prepare(SQL_AdStaff::DELETE_USER_MAIN_GROUP());
+				$DB_DEL->execute(array('uid'=>$user['uid']));
+				
+				// 加入新主要群組
+				$DB_INS = $this->DBLink->prepare(SQL_AdStaff::INSERT_USER_MAIN_GROUP());
+				$DB_INS->bindvalue(':uid',$user['uid'] );
+				$DB_INS->bindvalue(':gid',$mv);
+				$DB_INS->bindvalue(':creater',$this->USER->UserID);
+				$DB_INS->execute();
+				
+				$user['gid'] = $mv;
+			}
 			unset($staff_modify['main_group']);
 			
 		  }else if(!isset($staff_data[$mf])){

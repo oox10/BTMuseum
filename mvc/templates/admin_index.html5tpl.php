@@ -173,7 +173,7 @@
 				  <div class='document_block'>
 					<h2>系統操作指南 <a href='docs/document_system_20160316.pdf' target=_blank> 下載 </a></h2>
 					<div>
-					  系統介面說明與操作指引，包含圖庫資料庫操作、分類管理、帳號管理、紀錄管理與回報管理五部分。
+					  系統介面說明與操作指引，包含系統操作、資料管理、帳號管理、網站管理與回報管理五部分。
 					</div>
 					
 				  </div>
