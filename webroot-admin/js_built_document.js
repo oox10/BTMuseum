@@ -14,12 +14,11 @@
 	$('.md_anchor').mousedown(function(){
 	  var module_dom = $(this).parents('.module_container');
       var new_move_flag = parseInt(module_dom.attr('move')) ? 0 : 1;   
-	  
 	  //set move flag
 	  if(new_move_flag){
 		module_dom.draggable({ handle: "header",disabled:false});  
 	  }else{
-		module_dom.draggable("disable");    
+		module_dom.draggable( "destroy" );    
 	  }
 	  module_dom.attr('move',new_move_flag);
 	});
@@ -30,8 +29,9 @@
 	  var module_dom = $(this).parents('.module_container');
       var new_move_flag = 0;   
 	  //set move flag
-	  module_dom.draggable("disable");    
+	  module_dom.draggable( "destroy" );    
 	  module_dom.attr('move',new_move_flag);
+	  
 	});
 	
 	
@@ -658,11 +658,102 @@
       if(store=='_newa') $(this).hide().next().show().focus();
 	});
 	
+	//@-- 跳轉列印頁面
 	
-	//@-- 列印詮釋資料
-	$('#act_print_volume_meta').click(function(){
-	  window.print();
+	$('#act_close_print_block').click(function(){
+	  $('.print_group_block').show();
+	  $('.print_table.relate').find('tbody:not(.print_template)').remove();
+	  $('body').removeClass('print_mode'); 
 	});
+	
+	$('#act_print_volume_meta').click(function(){
+	  
+	  var volumn_id = $("#VOLUMEID").data('set');
+	  var act_object = $(this)
+	  // active ajax
+      $.ajax({
+        url: 'index.php',
+	    type:'POST',
+	    dataType:'json',
+	    data: {act:'Meta/volumeprint/'+volumn_id},
+		beforeSend: function(){  active_loading(act_object,'initial'); },   // 因為video load 會將  event peading
+        error: 		function(xhr, ajaxOptions, thrownError) {  console.log( ajaxOptions+" / "+thrownError);},
+	    success: 	function(response) {
+		  if(response.action){
+			var data_print =  response.data.meta;
+			
+			// 輸入列印介面
+			$.each(data_print['source'],function(mf,mv){
+			  var print_id = mf.replace(/^META/,'P');
+			  if($('#'+print_id).length){
+				$('#'+print_id).html(mv);  
+			  }
+			});
+			
+		    var counter=0;
+			$.each(data_print['research'],function(i,record){
+			  var rdom = $('#print-research').find('tbody.print_template').clone();
+			  counter++;
+			  $.each(record,function(rf,rv){
+				rdom.find('.P-no').html(counter+'.');  
+			    var print_class = rf.replace(/^META/,'P');
+			    if(rdom.find('.'+print_class).length){
+				  rdom.find('.'+print_class).html(rv);  
+			    }
+			  });			  
+			  rdom.removeClass('print_template').appendTo($('#print-research'));
+			});
+			$('#print-research').parents('.print_group_block').find('.is_print').prop('checked',counter ? true : false);
+			
+			var counter=0;
+			$.each(data_print['display'],function(i,record){
+			  var rdom = $('#print-display').find('tbody.print_template').clone();
+			  counter++;
+			  $.each(record,function(rf,rv){
+				rdom.find('.P-no').html(counter+'.');  
+			    var print_class = rf.replace(/^META/,'P');
+			    if(rdom.find('.'+print_class).length){
+				  rdom.find('.'+print_class).html(rv);  
+			    }
+			  });			  
+			  rdom.removeClass('print_template').appendTo($('#print-display'));
+			});
+			$('#print-display').parents('.print_group_block').find('.is_print').prop('checked',counter ? true : false);
+			
+			var counter=0;
+			$.each(data_print['movement'],function(i,record){
+			  var rdom = $('#print-movement').find('tbody.print_template').clone();
+			  counter++;
+			  $.each(record,function(rf,rv){
+				rdom.find('.P-no').html(counter+'.');  
+			    var print_class = rf.replace(/^META/,'P');
+			    if(rdom.find('.'+print_class).length){
+				  rdom.find('.'+print_class).html(rv);  
+			    }
+			  });			  
+			  rdom.removeClass('print_template').appendTo($('#print-movement'));
+			});
+			$('#print-movement').parents('.print_group_block').find('.is_print').prop('checked',counter ? true : false);
+			
+			
+			
+			$('body').addClass('print_mode'); 
+			 
+			 
+		  }else{
+			system_message_alert('',response.info);
+	      }
+	    },
+		complete:	function(){  }
+      }).done(function(r) {  active_loading(act_object , r.action );  });
+	  
+	  
+	   
+	});
+	
+	
+	
+	
 	
 	//@-- 新增詮釋資料
 	$('#act_create_volume_meta').click(function(){
@@ -1848,14 +1939,17 @@
 	//-- admin record active data print //列印函數
 	(function() {
     var beforePrint = function() {
-		$('.page_print_container').empty();
-		$('div#record_master').clone().appendTo('.page_print_container');
-		
-        //console.log('Functionality to run before printing.');
+	  $('.is_print').each(function(){
+		if(!$(this).prop('checked')){
+		  $(this).parents('.print_group_block').hide();	
+		}  
+		  
+	  })
     };
     var afterPrint = function() {
-		$('.page_print_container').empty();
-        //console.log('Functionality to run after printing');
+      $('.print_group_block').show();
+	  $('.print_table.relate').find('tbody:not(.print_template)').remove();
+	  $('body').removeClass('print_mode'); 
     };
 
     if (window.matchMedia) {

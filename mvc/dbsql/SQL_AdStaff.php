@@ -97,6 +97,20 @@
 	
 	
 	
+	//-- Admin Staff : Delete Main Group
+	public static function DELETE_USER_MAIN_GROUP(){
+	  $SQL_String = "DELETE FROM permission_matrix WHERE uid=:uid AND master=1;";
+	  return $SQL_String;
+	}
+	
+	//-- Admin Staff : Insert Main Group
+	public static function INSERT_USER_MAIN_GROUP(){
+	  $SQL_String = "INSERT INTO permission_matrix VALUES(:uid,:gid,COLUMN_CREATE('R00', 0, 'R01', 0, 'R02', 0, 'R03',0 , 'R09',1),1,'',:creater,NULL);";
+	  return $SQL_String;
+	}
+	
+	
+	 
 	
 	//-- Admin Staff : Modify Staff Data
 	public static function ADMIN_STAFF_UPDATE_STAFF_DATA( $MmodifyFields = array(1) ){

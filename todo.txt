@@ -1,5 +1,8 @@
 TODO:
-單件新增
+列印勾選影像
+firefox 點選毛點壞掉
+新增資料設定全宗
+群組全宗篩選
 
 [builter]
 display ?

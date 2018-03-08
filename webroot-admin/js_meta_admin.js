@@ -50,7 +50,6 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	  $(this).addClass('selected').prev().prop('checked',true);
 	});
 	
-	
 	// 取得檢索設定
 	function get_search_condition(){
 	  // 檢索條件

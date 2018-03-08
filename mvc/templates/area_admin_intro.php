@@ -3,7 +3,7 @@
 				  <p class='format_desc'>
 					<ol class='test_list'>
 					  <li><span class='test_title'>主管機關</span>:<a href='http://www.beitoumuseum.org.tw' target='_blank'> 北投文物館 </a></li>
-					  <li><span class='test_title'>承辦單位</span>:<a href='' target='_blank'> 吉達思科技 </a></li>
+					  <li><span class='test_title'>承辦單位</span>: 吉達思科技  </li>
 					</ol>
 				  </p>
 				<div class='desc_border'>使用需求</div>
@@ -21,8 +21,8 @@
 					<tr> <td> 北投文物館 </td></tr>
 					<tr> <td >TEL：Tel：02-2891-2318 # 9 <br/> E-mail：beitoumuseum@gmail.com</td> </tr>
 					<tr> <td ></td> </tr>
-					<tr> <td> 系統維護 :  </td></tr>
-					<tr> <td >TEL：02-2708-7332 何小姐 </td> </tr>
+					<tr> <td> 系統維護 : 吉達思科技  </td></tr>
+					<tr> <td >TEL：02-2790-7122 <br/>E-mail：doraho@gdastech.com</td> </tr>
 				  </table>
 				  
 			  </div>

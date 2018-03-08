@@ -31,6 +31,8 @@
 	<?php
 	$user_info 		= isset($this->vars['server']['data']['user']) 		? $this->vars['server']['data']['user'] 	: array('user'=>array('user_name'=>'Anonymous'),'group'=>array());
 	
+	
+	
 	$zong_info 		= isset($this->vars['server']['data']['zongs']) 		? $this->vars['server']['data']['zongs'] 	: array();
 	
 	

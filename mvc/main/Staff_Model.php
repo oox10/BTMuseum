@@ -37,6 +37,15 @@
 		$result['data']['setting']   = $roles;		
 	  
 		
+		// 取得群組列表
+		$DB_OBJ = $this->DBLink->prepare(SQL_AdStaff::SELECT_GROUP_LIST());
+		if(!$DB_OBJ->execute()){
+		  throw new Exception('_SYSTEM_ERROR_DB_ACCESS_FAIL');  
+		}
+		$groups =  $DB_OBJ->fetchAll(PDO::FETCH_ASSOC);
+		$result['data']['groups']   = $groups;		
+	    
+		
 		// 取得角色列表
 		$DB_OBJ = $this->DBLink->prepare(SQL_AdStaff::GET_ROLES_LIST());
 		if(!$DB_OBJ->execute()){
@@ -354,7 +363,24 @@
 		}
 		
 		foreach($staff_modify as $mf => $mv){
-		  if(!isset($staff_data[$mf])){
+		  
+		  if($mf == 'main_group' && $mv != $user['gid']){
+            // 移除使用者目前群組
+            $DB_DEL = $this->DBLink->prepare(SQL_AdStaff::DELETE_USER_MAIN_GROUP());
+			$DB_DEL->execute(array('uid'=>$user['uid']));
+			
+			// 加入新主要群組
+			$DB_INS = $this->DBLink->prepare(SQL_AdStaff::INSERT_USER_MAIN_GROUP());
+			$DB_INS->bindvalue(':uid',$user['uid'] );
+			$DB_INS->bindvalue(':gid',$mv);
+			$DB_INS->bindvalue(':creater',$this->USER->UserID);
+			$DB_INS->execute();
+			
+			$user['gid'] = $mv;
+			
+			unset($staff_modify['main_group']);
+			
+		  }else if(!isset($staff_data[$mf])){
 			throw new Exception('_SYSTEM_ERROR_PARAMETER_FAILS');
 		  }
 		}

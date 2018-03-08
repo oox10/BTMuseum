@@ -810,7 +810,27 @@
 	
 	//@-- click thumb
 	$(document).on('click','.thumb',function(){
-	  $('.page_selecter').val($(this).attr('p')).trigger('change');
+		
+	  if(!$('body').hasClass('print_mode')){
+		$('.page_selecter').val($(this).attr('p')).trigger('change');  
+	  }else{
+		//列印模式，新增影像到列表
+        
+	    var root =  $('#DATAROOT').data('set');
+	    var folder =  $('#DOFOLDER').data('set');
+	    var PageName = $(this).attr('p');
+	    var img_path	 = 'dobj.php?src='+root+'browse/'+folder+'/'+PageName;
+        if($("li.print_img_block[id='PRINT-"+PageName+"']").length){
+		  $("li.print_img_block[id='PRINT-"+PageName+"']").remove();	
+		}else{
+		  var print_img_dom = $('<li/>').addClass('print_img_block nonbreak').append("<img src='"+img_path+"' />").attr('id','PRINT-'+PageName)
+          print_img_dom.appendTo('#print_images');
+		}
+		
+		
+	  }
+		
+	  
 	});
 	
 	

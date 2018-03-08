@@ -782,6 +782,8 @@
 				    <span class='_volume _variable' id='META-V-_userupdate' > <?php echo $meta_collect['META-V-_userupdate'];?> </span> 
 				    </div>
 				</footer>
+				
+				
 			  </div>
 			   
 			  
@@ -1343,7 +1345,116 @@
 	  </div>
 	</div>
   
-    <div class='system_print_area'><div class='page_print_container'></div></div>
+    <div class='system_print_area' style='' id='print_dom'>
+	  <div class='page_print_container'>
+	    
+		<h1>
+		  <span>文物資料列印</span>
+		  <span>
+		    <button onclick="window.print()";>列印</button>
+		    <button id='act_close_print_block'>關閉</button>
+		  </span>
+		</h1>
+		<div class='print_group_block nonbreak'>
+			<h2>
+			  <span>文物基本資料</span>
+			  <span>
+			    列印<input type='checkbox' class='is_print' checked />
+			  </span>
+			</h2>
+			<table class='print_table'>
+			  <tr><th >文物編號 </th><td ><span class='print_value' id='P-V-store_id'></span><span class='print_value' id='P-store_orl'></span></td></tr>
+			  <tr><th >全宗 </th><td class='print_value' id='P-V-fonds'></td></tr>
+			  <tr><th >名稱 </th><td class='print_value' id='P-V-fonds'></td></tr>
+			  <tr><th >類別 </th><td class='print_value' id='P-V-categories'></td></tr>
+			  <tr><th >尺寸 </th><td class='print_value' id='P-V-size_info'></td></tr>
+			  <tr><th >族群 </th><td class='print_value' id='P-V-ethnic'></td></tr>
+			  <tr><th >所屬年代 </th><td class='print_value' id='P-V-period'></td></tr>
+			  <tr><th >入藏年代 </th><td class='print_value' id='P-V-saved_year'></td></tr>
+			  <tr><th >採集方式 </th><td class='print_value' id='P-V-acquire_type'></td></tr>
+			  <tr><th >來源說明 </th><td class='print_value' id='P-V-acquire_info'></td></tr>
+			  <tr><th >狀況代碼 </th><td class='print_value' id='P-V-status_code'></td></tr>
+			  <tr><th >狀況簡述 </th><td class='print_value' id='P-V-status_descrip'></td></tr>
+			  <tr><th >入庫時間 </th><td class='print_value' id='P-V-store_date'></td></tr>
+			  <tr><th >存放地點 </th><td class='print_value' id='P-V-store_location'></td></tr>
+			  <tr><th >架號 </th><td class='print_value' id='P-V-store_number'></td></tr>
+			  <tr><th >箱號 </th><td class='print_value' id='P-V-store_boxid'></td></tr>
+			  <tr><th >註銷資訊 </th><td ><span class='print_value' id='P-V-logout_flag'></span> : <span class='print_value' id='P-logout_descrip'></span></td></tr>
+			  <tr><th >備註 </th><td class='print_value' id='P-V-remark'></td></tr>
+			  <tr><th >影像數量 </th><td class='print_value' id='P-V-count_dofiles'></td></tr>
+			</table>
+		</div>
+		<div class='print_group_block nonbreak'>
+			<h2>
+			  <span>研究引用</span>
+			  <span>
+			    列印<input type='checkbox' class='is_print' checked />
+			  </span>
+			</h2>
+			<table class='print_table relate' id='print-research'>
+			  <tbody class='print_template '>
+				<tr><th >序號 </th><td class='print_value P-no'></td></tr>
+				<tr><th >題目 </th>	<td class='print_value P-R-title'></td></tr>
+				<tr><th >書籍期刊名稱 </th><td class='print_value P-R-source'></td></tr>
+				<tr><th >作者 </th><td class='print_value P-R-author'></td></tr>
+				<tr><th >發表年代 </th><td class='print_value P-R-pubyear'></td></tr>
+				<tr><th >出版單位 </th><td class='print_value P-R-publisher'></td></tr>
+			  </tbody> 
+			</table>
+		</div>
+		
+		<div class='print_group_block nonbreak'>
+			<h2>
+			  <span>展覽紀錄</span>
+			  <span>
+			    列印<input type='checkbox' class='is_print' checked />
+			  </span>
+			</h2>
+			<table class='print_table relate' id='print-display' >
+			  <tbody  class='print_template '>
+				<tr><th >序號 </th><td class='print_value P-no'></td></tr>
+				<tr><th >日期 </th><td class='print_value P-D-display_date'></td></tr>
+				<tr><th >展覽主題 </th><td class='print_value P-D-display_topic'></td></tr>
+				<tr><th >展覽地點 </th><td class='print_value P-D-display_place'></td></tr>
+				<tr><th >展覽單位 </th><td class='print_value P-D-display_organ'></td></tr>
+			  </tbody>
+			</table>
+		</div>
+		
+		<div class='print_group_block nonbreak' id='print_image_after'>
+			<h2>
+			  <span>異動紀錄</span>
+			  <span>
+			    列印<input type='checkbox' class='is_print' checked />
+			  </span>
+			</h2>
+			<table class='print_table relate' id='print-movement' >
+			  <tbody class='print_template '>
+				<tr><th >序號 </th><td class='print_value P-no'></td></tr>
+				<tr><th >類型 </th><td class='print_value P-M-move_type'></td></tr>
+				<tr><th >地點 </th><td class='print_value P-M-move_location'></td></tr>
+				<tr><th >說明 </th><td class='print_value P-M-move_reason'></td></tr>
+				<tr><th >日期 </th><td class='print_value P-M-move_date'></td></tr>
+				<tr><th >經手人 </th><td class='print_value P-M-move_handler'></td></tr>
+			  </tbody> 
+			</table>
+		</div>
+		
+		<div class='print_group_block'>
+			<h2>
+			  <span>文物影像</span>
+			  <span>
+			    列印<input type='checkbox' class='is_print' checked />
+			  </span>
+			</h2>
+			<ul id='print_images'>
+			  <li class='print_template'></li>
+			</ul>
+	    </div>
+		
+		
+	  </div>
+	</div>
   
   </body>
 </html>

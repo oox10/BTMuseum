@@ -225,6 +225,14 @@
 	}
 	 
 	 
+	 // AJAX: 列印頁面資料 
+	public function volumeprint($DataStoreNo){
+	  $this->Model->ADBuilt_Get_Volume_Meta($DataStoreNo); 
+	  self::data_output('json','',$this->Model->ModelResult); 
+	}
+	
+	 
+	 
 	 
 	 
 	// AJAX: 取得資料內容
@@ -344,51 +352,7 @@
 	
 	
 	
-	/*
-	// AJAX: 新增資料 
-	public function newaitem($TaskNo,$DataJson){
-	  $action = $this->Model->ADBuilt_Newa_Item_Data($TaskNo,$_SESSION[_SYSTEM_NAME_SHORT]['METACOLLECTION'],$DataJson);
-	  if($action['action']){
-		$this->Model->ADBuilt_Get_Item_Data($TaskNo, $action['data']);
-	  }
-	  self::data_output('json','',$this->Model->ModelResult); 
-	}
-	
-	// AJAX: 完成資料 
-	public function doneitem($TaskNo,$DataNo){
-	  $this->Model->ADBuilt_Done_Item_Data($TaskNo,$DataNo);
-	  self::data_output('json','',$this->Model->ModelResult); 
-	}
-	
-	
-	
-	// AJAX: 完成任務 
-	public function finish($TaskNo){
-	  $this->Model->ADBuilt_Finish_Work_Task($TaskNo);
-	  self::data_output('json','',$this->Model->ModelResult); 
-	}
-	
-	// AJAX: 退回任務 
-	public function goback($TaskNo){
-	  $this->Model->ADBuilt_Return_Work_Task($TaskNo);
-	  self::data_output('json','',$this->Model->ModelResult); 
-	}
-    
-	// AJAX: 確認任務 
-	public function checked($TaskNo){
-	  $this->Model->ADBuilt_Checked_Work_Task($TaskNo);
-	  self::data_output('json','',$this->Model->ModelResult); 
-	}
-	
-	
-	// FILE: 下載任務資料 
-	public function export($TaskNoString){
-	  $this->Model->ADBuilt_Export_Work_Task($TaskNoString);
-	  self::data_output('xlsx','template_built_task_export.xlsx',$this->Model->ModelResult);
-	}
-
-	*/
-	
+	 
 
 
 
@@ -505,11 +469,7 @@
 	}
 	
 	
-	// POST: 更新議員頭像
-	public function mbrpho($DataNo=''){
-	  $this->Model->ADMeta_Upload_Member_Photo($DataNo,$_FILES);
-	  self::data_output('html','admin_callback_reloadportrait',$this->Model->ModelResult); 
-	}
+	 
 	
   }
   

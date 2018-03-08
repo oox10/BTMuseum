@@ -43,7 +43,7 @@
 				  <input type='text'     id='uname' class='lg_text' placeholder="帳號 / email">
 				  <input type='password' id='upass' class='lg_text' placeholder="Password">
 				  <div class='signin_func'>
-					<span class='forgot'> <a id='act_forgot'>忘記密碼?</a> </span>
+					<span class='forgot'>  </span> <!--<a id='act_forgot'>忘記密碼?</a>-->
 					<span class='signin'> <button id='act_signin'>登入</button> </span>
 				  </div> 
 				</div>

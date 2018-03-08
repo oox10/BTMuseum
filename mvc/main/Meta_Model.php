@@ -7,6 +7,7 @@
     public function __construct(){
 	  parent::__construct();
 	  parent::initial_user($_SESSION[_SYSTEM_NAME_SHORT]['ADMIN']['USER']);
+	   
 	}
 	
 	protected $ResultCount;   // 查詢結果數量
@@ -29,11 +30,24 @@
 	  $result  = &$this->ModelResult[$result_key];
 	  try{  
 		
+		$group_2_zong = ['adm'=>['*'],'btm'=>['*'],'sln'=>['002'],'tea'=>['003'],'lay'=>['004']];	//'adm'=>'*',
+	    $user_allow_zongs = [];
+	    if(isset($this->USER->PermissionQue)&&is_array($this->USER->PermissionQue)){
+		  $user_groups = array_keys($this->USER->PermissionQue);
+	      foreach($user_groups as $g){
+		    if(!isset($group_2_zong[$g])) continue;
+            $user_allow_zongs = array_merge($user_allow_zongs,$group_2_zong[$g]);
+		  }
+	    }
+		
+		$user_allow_zongs = array_unique($user_allow_zongs);
+		
 		// 取得全宗資訊
 		$zongs = [];
 		$DB_GET= $this->DBLink->prepare(SQL_AdMeta::GET_ZONG_LIST());
 		if($DB_GET->execute()){
 		  while($tmp = $DB_GET->fetch(PDO::FETCH_ASSOC)){
+			if(!in_array('*',$user_allow_zongs) && !in_array($tmp['zid'],$user_allow_zongs)) continue;
 			$zongs[$tmp['zid']] = $tmp;    
 		  }
 		}
@@ -99,7 +113,16 @@
 	  $result_key = parent::Initial_Result('filter');
 	  $result  = &$this->ModelResult[$result_key];
 	  
-	  
+	  $group_2_zong = ['adm'=>['*'],'btm'=>['*'],'sln'=>['002'],'tea'=>['003'],'lay'=>['004']];	 
+	  $user_allow_zongs = [];
+	  if(isset($this->USER->PermissionQue)&&is_array($this->USER->PermissionQue)){
+		  $user_groups = array_keys($this->USER->PermissionQue);
+	      foreach($user_groups as $g){
+		    if(!isset($group_2_zong[$g])) continue;
+            $user_allow_zongs = array_merge($user_allow_zongs,$group_2_zong[$g]);
+		  }
+	  }
+	  $user_allow_zongs = array_unique($user_allow_zongs);
 	  
 	  try{
 	    
@@ -124,6 +147,9 @@
 		logout => 0/1  //註銷
 		
 		*/
+		
+		
+		
 	    
   	    $data_search = json_decode(base64_decode(str_replace('*','/',rawurldecode($SearchConfig))),true); 
 		
@@ -191,8 +217,17 @@
 		  */
 		}
 		
+		
 		if(isset($data_search['data_zong'])&&count($data_search['data_zong'])){
-		  $term_query[] = 'zong:('.join(' ',$data_search['data_zong']).')';	
+		  $search_zong = [];
+		  foreach($data_search['data_zong'] as $z){
+			if( in_array('*',$user_allow_zongs) || in_array($z,$user_allow_zongs)){
+			  $search_zong[] = $z;	
+			}
+		  }
+		  $term_query[] = 'zong:('.join(' ',$search_zong).')';	
+		}else{
+		  $term_query[] = 'zong:('.join(' ',$user_allow_zongs).')';	
 		}
 		
 		if(isset($data_search['logout'])&&$data_search['logout']){
@@ -3144,6 +3179,37 @@
       }
 	  return $result;  
 	}
+	
+	
+	
+	//-- Admin Built : Get Volume Source Metadata
+	// [input] : VolumeId  	:    
+	// [input] : HtmlEncode :    
+	// [input] : Image     	:    
+	 
+	public function ADBuilt_Print_Volume_Page($VolumeId='',$Image=''){
+		
+	  $result_key = parent::Initial_Result('print');
+	  $result  = &$this->ModelResult[$result_key];
+	  try{  
+		
+		$print_page = $Image;
+		
+		// final
+		$result['action'] = true;
+		$result['data']['html']   = $print_html;
+		$result['data']['page']   = $print_page;
+		
+	  } catch (Exception $e) {
+        $result['message'][] = $e->getMessage();
+      }
+	  return $result; 	 
+	}
+	
+	
+	
+	
+	
 	
 	
 	

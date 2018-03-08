@@ -47,8 +47,12 @@
 	
 	$page_conf  	= isset($this->vars['server']['data']['page'])    ? $this->vars['server']['data']['page'] : array();
 	
+	
+	
+	
+	
 	//<<Refer from login>> : 登入相依變數
-	$ui_config      = isset($user_info['permission']['interface_mask']) ? $user_info['permission']['interface_mask'] : array();
+	$ui_config    = isset($user_info['permission']['interface_mask']) ? $user_info['permission']['interface_mask'] : array();
 	$admin_open   = isset($ui_config['*']) ? true : false;
 	
 	?>
@@ -308,11 +312,21 @@
 				  <label class='data_field'> IP限制 </label>
 				  <div class='data_value'> <input type='text' class='_variable _update' id='ip_range' /></div>
 				</div>
+				
+				<?php if($admin_open):?>
 				<div class='data_col '> 
-				  <label class='data_field'> 帳號群組 </label>
-				  <div class='data_value'>  <span class='_variable' name='groups' id="main_group" >123</span>  </div> 
+				  <label class='data_field'> 主要群組 </label>
+				  <select id='main_group' class='_variable _update' >
+				    <?php foreach($module_config['groups'] as $group):?>
+					<option value='<?php echo $group['ug_code'];?>'><?php echo $group['ug_name'];?></option>
+					<?php endforeach; ?>
+				  </select>
 				</div>
-				 
+				<?php endif;?>
+				<div class='data_col '> 
+				  <label class='data_field'> 加入群組 </label>
+				  <div class='data_value'>  <span class='_variable' name='groups' id="rela_group" ></span>  </div>  
+				</div> 
 				
 				<?php if($admin_open || isset($ui_config['admin_staff.html5tpl.php']['roleset']) && intval($ui_config['admin_staff.html5tpl.php']['roleset'])): ?> 
 				<div class='data_col' id='roleset'> 

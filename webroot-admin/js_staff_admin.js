@@ -338,10 +338,11 @@
 			$("span[name='groups']").html('');	  
 			$.each(meta,function(i,g){
 			  if(parseInt(g.master)){
-				$("span#main_group").html("<i title='"+g.ug_info+"'>"+g.ug_name+"</i>");  
-			  }else{
-				$("span#rela_group").append("<i title='"+g.ug_info+"'>"+g.ug_name+"；</i>");	  
+				if($("#main_group").length){
+				  $("#main_group").val(g.gid)	
+				}
 			  }
+			  $("span#rela_group").append("<i title='"+g.ug_info+"'>"+g.ug_name+"；</i>");	  
 			});  
 		}else{
 			if(  $("._variable[id='"+field+"']").length ){  
