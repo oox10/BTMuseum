@@ -810,6 +810,9 @@
 		  var field_name  = typeof $(this).attr('id') != 'undefined' ? $(this).attr('id') : $(this).attr('name');
 	      var field_value = $(this).val();
 		  modify_data[field_name] = field_value;
+		  if(field_name == 'META-V-zong'){
+			modify_data['META-V-fonds'] = $('#'+field_name).find('option:selected').text();   
+		  }
 		}
 		
 		if( ($(this).hasClass('_must')  || $(this).parents('.data_value').prev().hasClass('_must')) && field_value=='' ){  

@@ -2385,6 +2385,7 @@
 		
 		// 執行詮釋資料更新
 		$meta_update['_index']=0;
+		
 		$DB_SAVE= $this->DBLink->prepare(SQL_AdMeta::UPDATE_METADATA_DATA(array_keys($meta_update)));
 		$DB_SAVE->bindValue(':sid'   , $volume['system_id']);
 		foreach($meta_update as $uf=>$uv){
@@ -3013,7 +3014,7 @@
 		    case "relic":
 		    
 			    $search_conf['class']   = $meta['class'];
-				$search_conf['zong']    = $meta['zong'];
+				$search_conf['zong']    = $source_array['collection']['zong'];
 				$search_conf['fonds']   = $source_array['collection']['fonds'];
 				
 			 
@@ -3135,7 +3136,8 @@
 			  $response = $client->index($params);
 			  
 			  // renew_meta
-			  $DB_UPD = $this->DBLink->prepare(SQL_AdMeta::UPDATE_METADATA_DATA(array('source_json','search_json','_lockmode','_auditint','_open','_view','_index')));
+			  $DB_UPD = $this->DBLink->prepare(SQL_AdMeta::UPDATE_METADATA_DATA(array('zong','source_json','search_json','_lockmode','_auditint','_open','_view','_index')));
+			  $DB_UPD->bindValue(':zong'  		, $search_conf['zong'] );
 			  $DB_UPD->bindValue(':_lockmode'   , $lockmode);
 			  $DB_UPD->bindValue(':_auditint'	, $auditint);
 			  $DB_UPD->bindValue(':_open'	 	, $open );

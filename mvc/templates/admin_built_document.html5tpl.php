@@ -181,9 +181,9 @@
 							</div>
 						  </div>
 						  <div class='data_col ' id='meta_field_store_no_value'> 
-						    <label class='data_field _must' > 典藏號 </label>
-						    <div class='data_value _must _bundle' >   
-							  <input type='text' class='_volume _variable _update _must' id='META-V-store_id' default='' readonly=true value='<?php echo $meta_collect['META-V-store_id'];?>' />
+						    <label class='data_field ' > 典藏號 </label>
+						    <div class='data_value  _bundle' >   
+							  <input type='text' class='_volume _variable _update ' id='META-V-store_id' default='' readonly=true value='<?php echo $meta_collect['META-V-store_id'];?>' />
 						    </div>
 						  </div>
 						  
@@ -221,6 +221,17 @@
 				    <div class='search_meta' > <!-- 資料欄位 -->
 					  
 					  <div class='field_set'>  
+						  <div class='data_col' id='meta_field_zong' style='flex:0 0 100px;'> 
+							<label class='data_field _must'>全宗</label>
+							<div class='data_value'>  
+                              <select class='_volume _variable _update _must' name="META-V-zong" id='META-V-zong'  >
+							    <option value='001' <?php echo $meta_collect['META-V-zong']=='001'?'selected':''; ?>>館藏文物</option>
+								<option value='002' <?php echo $meta_collect['META-V-zong']=='002'?'selected':''; ?>>樹林</option>
+								<option value='003' <?php echo $meta_collect['META-V-zong']=='003'?'selected':''; ?>>茶道</option>
+								<option value='004' <?php echo $meta_collect['META-V-zong']=='004'?'selected':''; ?>>布置品</option>
+							  </select>
+							</div>
+						  </div>
 						  <div class='data_col' id='meta_field_title' > 
 							<label class='data_field _must'>品名</label>
 							<div class='data_value'>   
