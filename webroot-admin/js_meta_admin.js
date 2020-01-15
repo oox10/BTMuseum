@@ -86,6 +86,17 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 		} 
 	  }
 	  
+	  
+	  // 排序設定
+	  if($(".order_by[mode != '0']").length){
+		search['sort'] = {
+		  'sfield': $(".order_by[mode!='0']").attr('order'),
+          'smode' : $(".order_by[mode!='0']").attr('mode'),	
+          'sname' : $(".order_by[mode!='0']").attr('name')		  
+	    }  
+	  }
+	  
+	  
 	  // 勾選後分類
 	  search['pquery'] = {};
 	  $('.pqterm:checked').each(function(){
@@ -134,6 +145,15 @@ $(window).on('load',function () {   //  || $(document).ready(function() {
 	  $(this).parents('li.fspackage').remove();
 	});
 	
+	
+	//-- data order by 欄位排序
+	$('.order_by').click(function(){
+	  var order_by_mode  = parseInt($(this).attr('mode'));
+	  var order_by_next  = ((order_by_mode+1)%3);	
+      $('.order_by').attr('mode','0');
+	  $(this).attr('mode',order_by_next);
+      $('#filter_submit').trigger('click');
+	});
 	
 	/*== Meta Pager function Set : 資料分頁函數 ==*/
 	

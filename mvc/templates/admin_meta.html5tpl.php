@@ -350,11 +350,55 @@
 						<tr class='data_field'>
 						  <td title='no'	><input type='checkbox' class='act_select_all'  >no.</td>
 						  <td title='縮圖'	>縮圖</td>
-						  <td title=''		>典藏號</td>
-						  <td title=''		>名稱</td>
-						  <td title=''		>存放位置</td>
-						  <td title=''		>圖檔</td>
-						  <td title=''		>入庫時間</td>
+						  <td title=''		>典藏號
+						    <a class = 'option order_by' 
+							   order = 'collection'  
+							   name  = '典藏號' 
+							   mode  = '<?php echo isset($data_filter['sort']['sfield']) && $data_filter['sort']['sfield']=='collection' ? $data_filter['sort']['smode'] : '0' ?>' 
+							>
+							  <i class="fa fa-sort" aria-hidden="true"  title='可排序' ></i>
+							  <i class="fa fa-long-arrow-up" aria-hidden="true" title='近到遠' ></i>
+							  <i class="fa fa-long-arrow-down" aria-hidden="true"  title='遠到近'></i>
+							</a> 
+						  
+						  
+						  </td>
+						  <td title=''		>名稱
+						    <a class = 'option order_by' 
+							   order = 'title'  
+							   name  = '名稱' 
+							   mode  = '<?php echo isset($data_filter['sort']['sfield']) && $data_filter['sort']['sfield']=='title' ? $data_filter['sort']['smode'] : '0' ?>' 
+							>
+							  <i class="fa fa-sort" aria-hidden="true"  title='可排序' ></i>
+							  <i class="fa fa-long-arrow-up" aria-hidden="true" title='近到遠' ></i>
+							  <i class="fa fa-long-arrow-down" aria-hidden="true"  title='遠到近'></i>
+							</a> 
+						  
+						  </td>
+						  <td title=''		>存放位置
+						    <a class = 'option order_by' 
+							   order = 'store_information'  
+							   name  = '存放位置' 
+							   mode  = '<?php echo isset($data_filter['sort']['sfield']) && $data_filter['sort']['sfield']=='store_information' ? $data_filter['sort']['smode'] : '0' ?>' 
+							>
+							  <i class="fa fa-sort" aria-hidden="true"  title='可排序' ></i>
+							  <i class="fa fa-long-arrow-up" aria-hidden="true" title='近到遠' ></i>
+							  <i class="fa fa-long-arrow-down" aria-hidden="true"  title='遠到近'></i>
+							</a>
+						  </td>
+						  <td title=''		>圖檔 </td>
+						  <td title=''		>入庫時間
+						    <a class = 'option order_by' 
+							   order = 'store_date'  
+							   name  = '入庫時間' 
+							   mode  = '<?php echo isset($data_filter['sort']['sfield']) && $data_filter['sort']['sfield']=='store_date' ? $data_filter['sort']['smode'] : '0' ?>' 
+							>
+							  <i class="fa fa-sort" aria-hidden="true"  title='可排序' ></i>
+							  <i class="fa fa-long-arrow-up" aria-hidden="true" title='近到遠' ></i>
+							  <i class="fa fa-long-arrow-down" aria-hidden="true"  title='遠到近'></i>
+							</a>
+						  
+						  </td>
 						  <td title=''		align=center ><button type='button' class='active' id='act_volume_create' ><i class="fa fa-plus" aria-hidden="true"></i></option></td>
 						</tr>
 						<tbody class='data_result' mode='list' >   <!-- list / search--> 

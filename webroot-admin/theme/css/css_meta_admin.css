@@ -217,7 +217,11 @@
 	
 
 
-
+	a.order_by{}
+	a.order_by > i{display:none;}
+	a.order_by[mode='0'] > i.fa-sort{display:inline-block;}
+	a.order_by[mode='1'] > i.fa-long-arrow-up{display:inline-block;}
+	a.order_by[mode='2'] > i.fa-long-arrow-down{display:inline-block;}
 
 
 
@@ -299,7 +303,7 @@
 	tr.data_record td:nth-child(2){  width:100px;}  tr.data_record td:nth-child(2) > img{width:100%;}
 	tr.data_record td:nth-child(3){  width:150px;  }
 	tr.data_record td:nth-child(4){  min-width:150px; }
-	tr.data_record td:nth-child(5){  width:230px; }
+	tr.data_record td:nth-child(5){  width:300px; }
 	tr.data_record td:nth-child(6){  width:60px; text-align:center;}
 	tr.data_record td:nth-child(7){  width:120px; }
 	tr.data_record td:nth-child(8){  width:100px; text-align:center;}

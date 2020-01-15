@@ -236,6 +236,19 @@
 		
 		$type_query = $data_search['data_type']=='element' ? 'data_type:element':'data_type:collection';
 		
+		//處理排序
+		if(isset($data_search['sort'])){
+		  $searchsort = [
+			$data_search['sort']['sfield']=>['order'=>$data_search['sort']['smode']==1 ? 'asc' : 'desc']
+		  ];
+		}else{
+		  $searchsort = [
+			//"_time_update"=>["order"=>"desc","missing"=>"_last"],
+			"_flag_update"=>["order"=>"desc"],
+			//"identifier"=>["order"=>"asc","missing"=>"_last"]
+		  ];
+		  $data_search['sort'] = ['sfield'=>'_flag_update','smode'=>1,'sname'=>'最後更新'];	
+		}
 		
 		
 		$params =[
@@ -250,10 +263,7 @@
 					"query"=> $type_query." ".( count($term_query) ? " AND ".join(" AND ",$term_query) : '' ),
 				 ],
 			  ],
-			  "sort"=>[
-			    "collection"=>["order"=>"asc"],
-				"identifier"=>["order"=>"asc","missing"=>"_last"]
-			  ],
+			  "sort"=>$searchsort,
 			  "post_filter"=>[
 			    "bool" =>[
 				  "must"=>[

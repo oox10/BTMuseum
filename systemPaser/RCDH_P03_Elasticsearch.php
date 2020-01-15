@@ -130,7 +130,8 @@
 					
 				    'title' => [
                         'type' => 'text',
-						'index' => true
+						'index' => true,
+						"fielddata"=>true
                     ],
 					'categories' => [
                         'type' => 'text',
@@ -160,7 +161,8 @@
 					
 					'store_date' => [
                         'type' => 'text',
-						'index' => true
+						'index' => true,
+						"fielddata"=>true
                     ],
 					'store_location' => [
                         'type' => 'text',
@@ -176,7 +178,8 @@
                     ],
 					'store_information' => [
                         'type' => 'text',
-						'index' => true
+						'index' => true,
+						"fielddata"=>true
                     ],
 					'count_dofiles' => [
                         'type' => 'integer',
