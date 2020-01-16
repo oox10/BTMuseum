@@ -102,15 +102,15 @@
         
 		
 		//-- 清除舊有影像
-        $doold = array_slice(scandir($store_location.'/saved/'.$bookmeta['store_no'].'/'),2)
+        $doold = array_slice(scandir($store_location.'/saved/'.$bookmeta['store_no'].'/'),2);
         foreach($doold as $odo){
 			unlink($store_location.'/saved/'.$bookmeta['store_no'].'/'.$odo);
 		}
-		$doold = array_slice(scandir($store_location.'/browse/'.$bookmeta['store_no'].'/'),2)
+		$doold = array_slice(scandir($store_location.'/browse/'.$bookmeta['store_no'].'/'),2);
         foreach($doold as $odo){
 			unlink($store_location.'/browse/'.$bookmeta['store_no'].'/'.$odo);
 		}
-		$doold = array_slice(scandir($store_location.'/thumb/'.$bookmeta['store_no'].'/'),2)
+		$doold = array_slice(scandir($store_location.'/thumb/'.$bookmeta['store_no'].'/'),2);
         foreach($doold as $odo){
 			unlink($store_location.'/thumb/'.$bookmeta['store_no'].'/'.$odo);
 		}
