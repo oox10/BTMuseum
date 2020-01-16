@@ -3092,7 +3092,14 @@
 					$search_conf['list_status_code'] 	= self::paser_postquery([$source_array['collection']['status_code']]);
 					$search_conf['list_store_location'] = self::paser_postquery([$source_array['collection']['store_location']]);
 					
-					
+					// 處理展覽紀錄
+					$display_record = [];
+					$db_display = $this->DBLink->prepare("SELECT * FROM  source_display WHERE  cid='".$meta['collection']."';");
+                    $db_display->execute();
+					while($tmp = $db_display->fetch(PDO::FETCH_ASSOC)){
+						$display_record[] = $tmp['display_topic'].'/'.$tmp['display_place'].'/'.$tmp['display_organ'];	 
+					}
+					$search_conf['list_displayrecord'] = join("；",$display_record);
 					
 					
 					// 系統設定
