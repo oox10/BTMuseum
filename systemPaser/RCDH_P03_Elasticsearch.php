@@ -215,7 +215,10 @@
                         'type' => 'keyword',
 						'index' => true
                     ],
-					
+					'list_displayrecord' => [
+                        'type' => 'text',
+						'index' => true
+                    ],
 					'logout_flag' => [
                         'type' => 'boolean',
                     ],

@@ -427,7 +427,16 @@
 		  $result_source[$key]['_dbsource'] = json_decode($meta['source_json'],true);
 		  
 		  
-		  $work_folder[] = $search['_id'];
+		  // 取得異動地點
+		  $DB_MOV	= $this->DBLink->prepare( SQL_AdMeta::GET_META_MOVEMENT());
+		  $DB_MOV->bindValue(':store_no',$meta['collection']);
+		  if($DB_MOV->execute() && $log = $DB_MOV->fetch(PDO::FETCH_ASSOC)){
+			if($log['move_location'] ){
+				$result_source[$key]['_dbsource']['collection']['store_move'] = '('.$log['move_location'].')';
+			}
+		  }
+		  
+		  
 		
 		}
 		

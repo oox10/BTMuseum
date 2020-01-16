@@ -423,7 +423,13 @@
 							<td class='meta_thumb'><img src='thumb.php?src=<?php echo $data['_search']['zong'];?>/browse/<?php echo $data['_search']['collection'];?>/<?php echo $data['@thumb'];?>' /></td>
 							<td class='meta_id'><?php echo $data_display['store_id'];?></td>
 							<td class='meta_title'><?php echo $data_display['title'];?></td>
-							<td class='meta_store'><?php echo $data_display['store_location'];?> / <?php echo $data_display['store_number'];?> / <?php echo $data_display['store_boxid'];?></td>
+							<td class='meta_store'>
+							    
+								<?php echo $data['_dbsource']['collection']['store_location'];?> / 
+								<?php echo $data['_dbsource']['collection']['store_number'];?> / 
+								<?php echo $data['_dbsource']['collection']['store_boxid'];?>
+								<?php echo isset($data['_dbsource']['collection']['store_move']) ? $data['_dbsource']['collection']['store_move'] : '';?>
+							</td>
 							<td class='meta_donum'><?php echo $data_display['count_dofiles'];?></td>
 							<td class='meta_saved'><?php echo $data_display['store_date'];?></td>
 							<td class='meta_option'>

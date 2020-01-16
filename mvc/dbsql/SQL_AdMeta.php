@@ -105,7 +105,11 @@
 	  return $SQL_String;
 	}
 	
-	
+	//-- Admin Meta : search item place
+	public static function GET_META_MOVEMENT(){
+	  $SQL_String = "SELECT * FROM source_movement WHERE cid=:store_no ORDER BY smno DESC;";
+	  return $SQL_String;
+	}
 	
    
 	//-- Admin Built : get source meta

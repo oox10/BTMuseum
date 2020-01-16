@@ -204,6 +204,16 @@
 					$auditint   = $source['collection']['_flag_privacy'];
 					$open       = $source['collection']['_flag_open'];
 					$view		= $source['collection']['_view'];	
+					
+					// 處理展覽紀錄
+					$display_record = [];
+					$db_display = $db->DBLink->prepare("SELECT * FROM  source_display WHERE  cid='".$meta['collection']."';");
+                    $db_display->execute();
+					while($tmp = $db_display->fetch(PDO::FETCH_ASSOC)){
+						$display_record[] = $tmp['display_topic'].'/'.$tmp['display_place'].'/'.$tmp['display_organ'];	 
+					}
+					$search_conf['list_displayrecord'] = join("；",$display_record);
+				    
 				
 				}else{  // 單篇meta
 				
