@@ -42,13 +42,16 @@
 	  $do_source_array = [];
 	  
 	  
+	   
+	  
 	  $dofolders = array_slice(scandir(_SOURCE_LOCATION),2);
 	  
 	  foreach($dofolders as $dofolder){
 		  
-        if(!is_dir(_SOURCE_LOCATION.$dofolder)) continue;	//非資料夾
+        if($dofolder=='DONE') continue;	//另存資料夾
+		if(!is_dir(_SOURCE_LOCATION.$dofolder)) continue;	//非資料夾
 		if(preg_match('/x\d{8}$/',$dofolder)) continue;		//處理過了 
-
+         
         $do_name_set = explode('-',$dofolder);
         $do_store_id = str_pad($do_name_set[0],3,'0',STR_PAD_LEFT).'-'.$do_name_set[1].'-'.str_pad($do_name_set[2],2,'0',STR_PAD_LEFT).'-'.str_pad($do_name_set[3],3,'0',STR_PAD_LEFT); 
 		
@@ -63,6 +66,7 @@
 		foreach($dofiles as $dofile){
 			$do_source_array[$do_store_id][] = [
 				'bookid' => $do_store_id,
+				'folder' => $dofolder,
 				'filename' => $dofile,
 				'filepath' => _SOURCE_LOCATION.$dofolder.'/'.$dofile,
 			]; 
@@ -180,6 +184,10 @@
 			$store_profile['items'][]=$newfileconf; 
 			
 			// 刪除來源檔案
+			$resave_folder = _SOURCE_LOCATION.'DONE/'.$bookimages['folder'].'/';
+			if(!is_dir($resave_folder))  mkdir($resave_folder,0777);
+			
+			copy($file_from,$resave_folder.$file['filename']);
 			unlink($file_from);
 		}
 		 
@@ -196,7 +204,8 @@
 		if(!$db_update->execute()){
 		  throw new Exception('更新失敗'); 	
 		}
-			
+		
+		 
 	    echo "update .".date('c');
 			
 		ob_flush();
@@ -209,9 +218,10 @@
 	  $dofolders = array_slice(scandir(_SOURCE_LOCATION),2);
 	  
 	  foreach($dofolders as $dofolder){
-		  
+		
+		if($dofolder=='DONE') continue;  
         if(!is_dir(_SOURCE_LOCATION.$dofolder)) continue;		
-
+		
         $do_name_set = explode('-',$dofolder);
         $do_store_id = str_pad($do_name_set[0],3,'0',STR_PAD_LEFT).'-'.$do_name_set[1].'-'.str_pad($do_name_set[2],2,'0',STR_PAD_LEFT).'-'.str_pad($do_name_set[3],3,'0',STR_PAD_LEFT); 
 		
@@ -221,8 +231,8 @@
 		}else{
 			rename(_SOURCE_LOCATION.$dofolder,_SOURCE_LOCATION.$dofolder.'x'.date('Ymd'));
 		}
+		
 	  }
-	  
 	  
 	  
 	  echo "\n 匯入完成!";
