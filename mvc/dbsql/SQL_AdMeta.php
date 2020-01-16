@@ -107,7 +107,7 @@
 	
 	//-- Admin Meta : search item place
 	public static function GET_META_MOVEMENT(){
-	  $SQL_String = "SELECT * FROM source_movement WHERE cid=:store_no ORDER BY smno DESC;";
+	  $SQL_String = "SELECT * FROM source_movement WHERE cid=:store_no AND _keep=1 ORDER BY smno DESC;";
 	  return $SQL_String;
 	}
 	
