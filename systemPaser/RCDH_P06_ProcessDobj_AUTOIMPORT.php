@@ -46,7 +46,8 @@
 	  
 	  foreach($dofolders as $dofolder){
 		  
-        if(!is_dir(_SOURCE_LOCATION.$dofolder)) continue;		
+        if(!is_dir(_SOURCE_LOCATION.$dofolder)) continue;	//非資料夾
+		if(preg_match('/x\d{8}$/',$dofolder)) continue;		//處理過了 
 
         $do_name_set = explode('-',$dofolder);
         $do_store_id = str_pad($do_name_set[0],3,'0',STR_PAD_LEFT).'-'.$do_name_set[1].'-'.str_pad($do_name_set[2],2,'0',STR_PAD_LEFT).'-'.str_pad($do_name_set[3],3,'0',STR_PAD_LEFT); 
@@ -177,8 +178,11 @@
 			];
 			
 			$store_profile['items'][]=$newfileconf; 
+			
+			// 刪除來源檔案
+			unlink($file_from);
 		}
-		
+		 
 		file_put_contents($store_location.'/profile/'.$bookmeta['store_no'].'.conf',json_encode($store_profile));	
 		
 		
@@ -199,6 +203,27 @@
 		flush();
 		
 	  }
+	  
+	  
+	  // 處理原始資料夾
+	  $dofolders = array_slice(scandir(_SOURCE_LOCATION),2);
+	  
+	  foreach($dofolders as $dofolder){
+		  
+        if(!is_dir(_SOURCE_LOCATION.$dofolder)) continue;		
+
+        $do_name_set = explode('-',$dofolder);
+        $do_store_id = str_pad($do_name_set[0],3,'0',STR_PAD_LEFT).'-'.$do_name_set[1].'-'.str_pad($do_name_set[2],2,'0',STR_PAD_LEFT).'-'.str_pad($do_name_set[3],3,'0',STR_PAD_LEFT); 
+		
+		$dofiles = array_slice(scandir(_SOURCE_LOCATION.$dofolder),2);
+		if(!count($dofiles)){
+			rmdir(_SOURCE_LOCATION.$dofolder);
+		}else{
+			rename(_SOURCE_LOCATION.$dofolder,_SOURCE_LOCATION.$dofolder.'x'.date('Ymd'));
+		}
+	  }
+	  
+	  
 	  
 	  echo "\n 匯入完成!";
 	   
