@@ -152,8 +152,8 @@
 					  <a class='option act_remove_fspackage' title='刪除搜尋條件'><i class="fa fa-times" aria-hidden="true"></i></a>
 					</li>
 				    <li class='fsdefault'><input type='text' id='filter_search_terms'  value='<?php echo isset($data_filter['search'][0]) ? $data_filter['search'][0]['value']:''; ?>' placeholder='輸入搜尋關鍵字' /></li>
-				    <?php if(count($data_filter['search'])) array_shift($data_filter['search']); ?>
-					<?php if(count($data_filter['search'])): ?>
+				    <?php if(isset($data_filter['search']) && count($data_filter['search'])) array_shift($data_filter['search']); ?>
+					<?php if(isset($data_filter['search']) && count($data_filter['search'])): ?>
 					<?php   foreach($data_filter['search'] as $search ): ?>
 					<li class='fspackage'>
 					  <select class='search_attr'>
@@ -190,19 +190,19 @@
 			  <li>
 			    <label id=''>全宗篩選：</label>
 				<?php foreach($zong_info as $zong):?>
-				<input type='checkbox' class='zselect' name='data_zong' value='<?php echo $zong['zid'];?>'	<?php echo in_array($zong['zid'],$data_filter['data_zong']) ? 'checked':''?> /> <span class='zname'><?php echo $zong['zname'];?></span>
+				<input type='checkbox' class='zselect' name='data_zong' value='<?php echo $zong['zid'];?>'	<?php echo isset($data_filter['data_zong']) && in_array($zong['zid'],$data_filter['data_zong']) ? 'checked':''?> /> <span class='zname'><?php echo $zong['zname'];?></span>
 				<?php endforeach; ?>
 			  
 			  </li>
 			  
 			  <li>
 			    <label id=''>層級篩選：</label>
-				<input type='radio' class='typesel' name='data_type' value='collection'	<?php echo $data_filter['data_type']=='collection' ? 'checked':''?> /> <span class=''>文物</span>
-				<input type='radio' class='typesel' name='data_type' value='element'	<?php echo $data_filter['data_type']=='element' ? 'checked':''?> /> <span class=''>影像</span>
+				<input type='radio' class='typesel' name='data_type' value='collection'	<?php echo isset($data_filter['data_type']) && $data_filter['data_type']=='collection' ? 'checked':''?> /> <span class=''>文物</span>
+				<input type='radio' class='typesel' name='data_type' value='element'	<?php echo isset($data_filter['data_type']) && $data_filter['data_type']=='element' ? 'checked':''?> /> <span class=''>影像</span>
 			  </li>
 			  <li>
 			    <label id=''>註銷篩選：</label>
-				<input type='checkbox' class='logoutsel' name='logout_flag' value='1'	<?php echo $data_filter['logout']=='1' ? 'checked':''?> /> <span class=''>已註銷文物</span>
+				<input type='checkbox' class='logoutsel' name='logout_flag' value='1'	<?php echo isset($data_filter['logout']) &&  $data_filter['logout']=='1' ? 'checked':''?> /> <span class=''>已註銷文物</span>
 			  </li>
 			  <!--
 			  <li>

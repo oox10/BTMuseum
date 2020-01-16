@@ -234,7 +234,10 @@
 		  $term_query[] = 'logout_flag:1';	
 		}
 		
-		$type_query = $data_search['data_type']=='element' ? 'data_type:element':'data_type:collection';
+		$type_query = isset($data_search['data_type']) && $data_search['data_type']=='element' ? 'data_type:element':'data_type:collection';
+		if(!isset($data_search['data_type'])){
+			$data_search['data_type']='collection';
+		}
 		
 		//處理排序
 		if(isset($data_search['sort'])){
