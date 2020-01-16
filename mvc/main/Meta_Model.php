@@ -436,7 +436,7 @@
 			}
 		  }
 		  
-		  
+		  $work_folder[] = $search['_id'];
 		
 		}
 		
@@ -478,7 +478,7 @@
 	  $result  = &$this->ModelResult[$result_key];
 	  
 	  $result['session']['_ADMETA_FOLDERS'] = [];
-	  if(isset($this->ModelResult['search']['data']['folder']) && count($this->ModelResult['search']['data']['folder'])){
+	  if(isset($this->ModelResult['search']['data']['folder'])){
 		 $result['session']['_ADMETA_FOLDERS']['search'] = $this->ModelResult['search']['data']['folder'];  
 	  }
 	  
