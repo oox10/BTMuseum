@@ -352,9 +352,9 @@
 						  <td title='縮圖'	>縮圖</td>
 						  <td title=''		>典藏號
 						    <a class = 'option order_by' 
-							   order = 'collection'  
+							   order = 'store_id'  
 							   name  = '典藏號' 
-							   mode  = '<?php echo isset($data_filter['sort']['sfield']) && $data_filter['sort']['sfield']=='collection' ? $data_filter['sort']['smode'] : '0' ?>' 
+							   mode  = '<?php echo isset($data_filter['sort']['sfield']) && $data_filter['sort']['sfield']=='store_id' ? $data_filter['sort']['smode'] : '0' ?>' 
 							>
 							  <i class="fa fa-sort" aria-hidden="true"  title='可排序' ></i>
 							  <i class="fa fa-long-arrow-up" aria-hidden="true" title='近到遠' ></i>
