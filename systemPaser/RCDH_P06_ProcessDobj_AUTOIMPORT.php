@@ -184,7 +184,7 @@
 			$store_profile['items'][]=$newfileconf; 
 			
 			// 刪除來源檔案
-			$resave_folder = _SOURCE_LOCATION.'DONE/'.$bookimages['folder'].'/';
+			$resave_folder = _SOURCE_LOCATION.'DONE/'.$file['folder'].'/';
 			if(!is_dir($resave_folder))  mkdir($resave_folder,0777);
 			
 			copy($file_from,$resave_folder.$file['filename']);
@@ -229,7 +229,7 @@
 		if(!count($dofiles)){
 			rmdir(_SOURCE_LOCATION.$dofolder);
 		}else{
-			rename(_SOURCE_LOCATION.$dofolder,_SOURCE_LOCATION.$dofolder.'x'.date('Ymd'));
+			//rename(_SOURCE_LOCATION.$dofolder,_SOURCE_LOCATION.$dofolder.'x'.date('Ymd'));
 		}
 		
 	  }
